@@ -1,76 +1,118 @@
 package com.example.nav3recipes.navigator.basic
 
-import androidx.compose.foundation.layout.add
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class NavigatorTest {
 
-    private data object Home : Navigator.Route.TopLevel
-    private data object ChatList : Navigator.Route.TopLevel
-    private data object ChatDetail
-    private data object Camera : Navigator.Route.TopLevel
-    private data object Search : Navigator.Route.Unique
+    private data object A : Route(isTopLevel = true)
+
+    private data object A1 : Route()
+    private data object B : Route(isTopLevel = true)
+    private data object B1 : Route()
+    private data object C : Route(isTopLevel = true)
+    private data object D : Route(isShared = true)
 
     @Test
-    fun backStackContainsStartKey(){
-        val navigator = Navigator<Any>(startRoute = Home)
-        assert(navigator.backStack.contains(Home))
+    fun backStackContainsOnlyStartRoute(){
+        val navigator = Navigator<Route>(startRoute = A)
+        assertEquals(listOf<Route>(A), navigator.backStack)
     }
 
     @Test
-    fun navigatingToTopRoute_addsRouteToTopOfStack(){
-        val navigator = Navigator<Any>(startRoute = Home)
-
-        // Back stack start state [Home]
-        // Navigate to ChatList
-        // Expected back stack state [Home, ChatList]
-        navigator.navigate(ChatList)
-        assertEquals(listOf<Any>(Home, ChatList), navigator.backStack)
+    fun navigatingToTopLevelRoute_addsRouteToTopOfStack(){
+        val navigator = Navigator<Route>(startRoute = A)
+        navigator.navigate(B)
+        assertEquals(listOf<Any>(A, B), navigator.backStack)
     }
 
     @Test
-    fun addingNonTopLevelRoute_addsToCurrentTopLevelStack() {
-        val navigator = Navigator<Any>(startRoute = Home) // Current: Home, Stack: [Home]
-
-        // Navigate to ChatList, making it the current top-level route
-        navigator.navigate(ChatList)
-        // Current: ChatList, Stack: [Home, ChatList]
-        assertEquals(listOf<Any>(Home, ChatList), navigator.backStack, "Backstack after adding ChatList")
-        assertEquals(ChatList, navigator.topLevelRoute, "Current top level route should be ChatList")
-
-        // Add ChatDetail (non-top-level) to the ChatList stack
-        navigator.navigate(ChatDetail)
-        // Current: ChatList, Stack: [Home, ChatList, ChatDetail]
-        assertEquals(listOf<Any>(Home, ChatList, ChatDetail), navigator.backStack, "Backstack after adding ChatDetail")
+    fun navigatingToChildRoute_addsToCurrentTopLevelStack() {
+        val navigator = Navigator<Route>(startRoute = A)
+        navigator.navigate(B)
+        navigator.navigate(B1)
+        assertEquals(listOf(A, B, B1), navigator.backStack)
     }
 
     @Test
-    fun navigatingToNewTopLevel_withDefaultConfig_popsOtherTopLevelAndItsChildren() {
-        // Default config: shouldPopOtherTopLevelRoutesWhenNavigatingToTopLevelRoute = true
-        val navigator = Navigator<Any>(startRoute = Home)
-        navigator.navigate(Search) // BackStack: [Home, Search]
-        navigator.navigate(Camera) // BackStack: [Home, Search, Camera]
-        navigator.navigate(ChatList)
-        val expected = listOf(Home, Search, ChatList) // Camera is popped before ChatList is added
+    fun navigatingToNewTopLevelRoute_popsOtherTopLevelStacks() {
+        val navigator = Navigator<Route>(startRoute = A)
+        navigator.navigate(A1) // [A, A1]
+        navigator.navigate(C) // [A, A1, C]
+        navigator.navigate(B) // [A, A1, B]
+        val expected = listOf(A, A1, B)
         assertEquals(expected, navigator.backStack)
     }
 
     @Test
-    fun navigatingToNewTopLevel_whenStartRouteCannotMove_popsOtherTopLevelStacksExceptStartRoute() {
-        val navigator = Navigator<Any>(startRoute = Home)
-        navigator.navigate(Camera)
-        val expected = listOf<Any>(Home, Camera) // Home is locked in place
+    fun navigatingToSharedRoute_whenItsAlreadyOnStack_movesItToNewStack() {
+        val navigator = Navigator<Route>(startRoute = A)
+        navigator.navigate(D) // [A, D]
+        navigator.navigate(C) // [A, D, C]
+        navigator.navigate(D) // [A, C, D]
+        val expected = listOf(A, C, D)
         assertEquals(expected, navigator.backStack)
     }
 
     @Test
-    fun navigatingToNewTopLevel_whenStartRouteCanMove_popsAllOtherTopLevelStacks() {
-        val navigator = Navigator<Any>(startRoute = Home, canStartRouteMove = true)
-        navigator.navigate(Camera)
-        val expected = listOf<Any>(Camera) // Home is popped
+    fun navigatingToStartRoute_whenOtherRoutesAreOnStack_popsAllOtherRoutes() {
+        val navigator = Navigator<Route>(startRoute = A)
+        navigator.navigate(B) // [A, B]
+        navigator.navigate(C) // [A, B, C]
+        navigator.navigate(A) // [A]
+        val expected : List<Route> = listOf(A)
         assertEquals(expected, navigator.backStack)
     }
 
+    @Test
+    fun navigatingToStartRoute_whenItHasSubRoutes_retainsSubRoutes() {
+        val navigator = Navigator<Route>(startRoute = A)
+        navigator.navigate(A1) // [A, A1]
+        navigator.navigate(B) // [A, A1, B]
+        navigator.navigate(A) // [A, A1]
+        val expected : List<Route> = listOf(A, A1)
+        assertEquals(expected, navigator.backStack)
+    }
 
+    @Test
+    fun repeatedlyNavigatingToTopLevelRoute_retainsSubRoutes(){
+        val navigator = Navigator<Route>(startRoute = A)
+        navigator.navigate(B)
+        navigator.navigate(B1)
+        navigator.navigate(B)
+
+        val expected = listOf(A, B, B1)
+        assertEquals(expected, navigator.backStack)
+    }
+
+    @Test
+    fun navigatingToTopLevelRoute_whenTopLevelRoutesCanExistTogether_retainsSubRoutes(){
+        val navigator = Navigator<Route>(startRoute = A, canTopLevelRoutesExistTogether = true)
+        navigator.navigate(A)
+        navigator.navigate(A1)
+        navigator.navigate(B)
+        navigator.navigate(B1)
+        navigator.navigate(C)
+        navigator.navigate(B)
+
+        val expected = listOf(A, A1, C, B, B1)
+        assertEquals(expected, navigator.backStack)
+    }
+
+    @Test
+    fun navigatingBack_isChronological(){
+        val navigator = Navigator<Route>(startRoute = A)
+        navigator.navigate(A1)
+        navigator.navigate(B)
+        navigator.navigate(B1)
+        assertEquals(listOf(A, A1, B, B1), navigator.backStack)
+        navigator.goBack()
+        assertEquals(listOf(A, A1, B), navigator.backStack)
+        navigator.goBack()
+        assertEquals(listOf(A, A1), navigator.backStack)
+        navigator.goBack()
+        assertEquals(listOf<Route>(A), navigator.backStack)
+
+    }
 }

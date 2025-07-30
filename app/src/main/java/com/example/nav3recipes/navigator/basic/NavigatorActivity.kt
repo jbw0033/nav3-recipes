@@ -19,41 +19,46 @@ package com.example.nav3recipes.navigator.basic
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
+import com.example.nav3recipes.content.ContentPink
 import com.example.nav3recipes.content.ContentPurple
 import com.example.nav3recipes.content.ContentRed
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 
-import kotlin.collections.remove
-
-private sealed interface NavBarItem : Navigator.Route.TopLevel {
-    val icon: ImageVector
-}
-private data object Home : NavBarItem { override val icon = Icons.Default.Home }
-private data object ChatList : NavBarItem { override val icon = Icons.Default.Face }
-private data object ChatDetail
-private data object Camera : NavBarItem { override val icon = Icons.Default.PlayArrow }
+private abstract class NavBarItem(val icon: ImageVector): Route(isTopLevel = true)
+private data object Home : NavBarItem(icon = Icons.Default.Home)
+private data object ChatList : NavBarItem(icon = Icons.Default.Face)
+private data object ChatDetail : Route()
+private data object Camera : NavBarItem(icon = Icons.Default.PlayArrow)
+private data object Search : Route(isShared = true)
 
 private val TOP_LEVEL_ROUTES : List<NavBarItem> = listOf(Home, ChatList, Camera)
 
@@ -62,9 +67,12 @@ class NavigatorActivity : ComponentActivity() {
         setEdgeToEdgeConfig()
         super.onCreate(savedInstanceState)
         setContent {
-            val navigator = remember { Navigator<Any>(Home) }
+            val navigator = remember { Navigator<Route>(Home) }
 
             Scaffold(
+                topBar = {
+                    TopAppBarWithSearch { navigator.navigate(Search) }
+                },
                 bottomBar = {
                     NavigationBar {
                         TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
@@ -85,8 +93,9 @@ class NavigatorActivity : ComponentActivity() {
                         }
                     }
                 }
-            ) { _ ->
+            ) { paddingValues ->
                 NavDisplay(
+                    modifier = Modifier.padding(paddingValues),
                     backStack = navigator.backStack,
                     onBack = { navigator.goBack() },
                     entryProvider = entryProvider {
@@ -102,9 +111,21 @@ class NavigatorActivity : ComponentActivity() {
                         }
                         entry<ChatDetail>{
                             ContentBlue("Chat detail screen")
+
                         }
                         entry<Camera>{
                             ContentPurple("Camera screen")
+                        }
+                        entry<Search>{
+                            ContentPink("Search screen"){
+                                var text by rememberSaveable { mutableStateOf("") }
+                                TextField(
+                                    value = text,
+                                    onValueChange = { newText -> text = newText},
+                                    label = { Text("Enter search here") },
+                                    singleLine = true
+                                )
+                            }
                         }
                     },
                 )
@@ -113,72 +134,24 @@ class NavigatorActivity : ComponentActivity() {
     }
 }
 
-class Navigator<T: Any>(
-    startRoute: T,
-    private val canStartRouteMove: Boolean = false,
-    private val shouldPopOtherTopLevelRoutesWhenNavigatingToTopLevelRoute: Boolean = true,
-    private val shouldRemoveChildRoutesWhenNavigatingBack: Boolean = false
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBarWithSearch(
+    onSearchClick: () -> Unit
 ) {
-
-    // Maintain a stack for each top level route
-    private var topLevelStacks : LinkedHashMap<T, SnapshotStateList<T>> = linkedMapOf(
-        startRoute to mutableStateListOf(startRoute)
-    )
-
-    // Expose the current top level route for consumers
-    var topLevelRoute by mutableStateOf(startRoute)
-        private set
-
-    // Expose the back stack so it can be rendered by the NavDisplay
-    val backStack = mutableStateListOf(startRoute)
-
-    private fun updateBackStack() =
-        backStack.apply {
-            clear()
-            addAll(topLevelStacks.flatMap { it.value })
-        }
-
-    private fun navigateToTopLevel(key: T){
-
-        // Remove any other top level stacks first
-        if (shouldPopOtherTopLevelRoutesWhenNavigatingToTopLevelRoute)
-            topLevelStacks.keys.filter { it != key }.forEach { topLevelStacks.remove(it) }
-
-        val doesStackExist = topLevelStacks.keys.contains(key)
-
-        if (doesStackExist){
-            // Move it to the end of the stacks
-            topLevelStacks.apply {
-                remove(key)?.let {
-                    put(key, it)
-                }
+    TopAppBar(
+        title = {
+            Text("Navigator Activity")
+        },
+        actions = {
+            IconButton(onClick = onSearchClick) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search"
+                )
             }
-        } else {
-            topLevelStacks.put(key, mutableStateListOf(key))
-        }
-        topLevelRoute = key
-        updateBackStack()
-    }
 
-    fun navigate(key: T){
-        if (key is Route.TopLevel){
-            navigateToTopLevel(key)
-        } else {
-            topLevelStacks[topLevelRoute]?.add(key)
-        }
-        updateBackStack()
-    }
-
-    fun goBack(){
-        val removedKey = topLevelStacks[topLevelRoute]?.removeLastOrNull()
-        // If the removed key was a top level key, remove the associated top level stack
-        topLevelStacks.remove(removedKey)
-        topLevelRoute = topLevelStacks.keys.last()
-        updateBackStack()
-    }
-
-    interface Route {
-        interface TopLevel
-        interface Unique // Non-top level route that is unique on the back stack (can move between top level stacks)
-    }
+        },
+    )
 }
+
