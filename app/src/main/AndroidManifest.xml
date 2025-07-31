@@ -96,7 +96,7 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
-            android:name=".migration.start.MainActivity"
+            android:name=".migration.start.MigrationActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity

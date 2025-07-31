@@ -4,6 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.serialization.Serializable
 
 /**
  * This class models navigation behavior. It provides a back stack
@@ -123,7 +125,14 @@ class Navigator<T: Route>(
     }
 }
 
+@Serializable
 abstract class Route(
     val isTopLevel : Boolean = false,
     val isShared : Boolean = false
+)
+
+class NavBarItem<T : Any>(
+    val route: T,
+    val icon: ImageVector,
+    val description: String
 )

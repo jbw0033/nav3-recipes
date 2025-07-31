@@ -52,18 +52,25 @@ import com.example.nav3recipes.content.ContentPink
 import com.example.nav3recipes.content.ContentPurple
 import com.example.nav3recipes.content.ContentRed
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
+import kotlinx.serialization.Serializable
 
-private abstract class NavBarItem(
-    val icon: ImageVector,
-    val description: String
-): Route(isTopLevel = true)
-private data object Home : NavBarItem(icon = Icons.Default.Home, description = "Home")
-private data object ChatList : NavBarItem(icon = Icons.Default.Face, description = "Chat list")
+@Serializable
+private data object Home : Route(isTopLevel = true)
+@Serializable
+private data object ChatList : Route(isTopLevel = true)
+
+@Serializable
 private data object ChatDetail : Route()
-private data object Camera : NavBarItem(icon = Icons.Default.PlayArrow, description = "Camera")
+@Serializable
+private data object Camera : Route(isTopLevel = true)
+@Serializable
 private data object Search : Route(isShared = true)
 
-private val TOP_LEVEL_ROUTES : List<NavBarItem> = listOf(Home, ChatList, Camera)
+private val TOP_LEVEL_ROUTES : List<NavBarItem<Route>> = listOf(
+    NavBarItem(Home, icon = Icons.Default.Home, description = "Home"),
+    NavBarItem(ChatList, icon = Icons.Default.Face, description = "Chat list"),
+    NavBarItem(Camera, icon = Icons.Default.PlayArrow, description = "Camera")
+)
 
 class NavigatorActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,12 +86,11 @@ class NavigatorActivity : ComponentActivity() {
                 bottomBar = {
                     NavigationBar {
                         TOP_LEVEL_ROUTES.forEach { topLevelRoute ->
-
-                            val isSelected = topLevelRoute == navigator.topLevelRoute
+                            val isSelected = topLevelRoute.route == navigator.topLevelRoute
                             NavigationBarItem(
                                 selected = isSelected,
                                 onClick = {
-                                    navigator.navigate(topLevelRoute)
+                                    navigator.navigate(topLevelRoute.route)
                                 },
                                 icon = {
                                     Icon(
