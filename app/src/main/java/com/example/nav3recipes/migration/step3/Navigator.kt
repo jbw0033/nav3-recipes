@@ -1,4 +1,4 @@
-package com.example.nav3recipes.migration.step1
+package com.example.nav3recipes.migration.step3
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.mutableStateListOf

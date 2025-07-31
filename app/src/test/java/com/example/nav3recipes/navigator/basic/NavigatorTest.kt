@@ -2,7 +2,6 @@ package com.example.nav3recipes.navigator.basic
 
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class NavigatorTest {
 

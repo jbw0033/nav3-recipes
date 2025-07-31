@@ -6,15 +6,16 @@ import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import com.example.nav3recipes.migration.step1.MigrationActivity
+import com.example.nav3recipes.migration.start.StartMigrationActivity
 import org.junit.Rule
 import org.junit.Test
 
 
 class MigrationActivityNavigationTest {
 
+    // To test each step in the migration plan, change the Activity name below.
     @get:Rule(order = 0)
-    val composeTestRule = createAndroidComposeRule<MigrationActivity>()
+    val composeTestRule = createAndroidComposeRule<StartMigrationActivity>()
 
     @Test
     fun firstScreen_isA() {
