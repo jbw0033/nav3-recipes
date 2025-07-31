@@ -164,3 +164,9 @@ fun TopAppBarWithSearch(
     )
 }
 
+class NavBarItem<T : Any>(
+    val route: T,
+    val icon: ImageVector,
+    val description: String
+)
+

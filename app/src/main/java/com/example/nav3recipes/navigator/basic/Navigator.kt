@@ -130,9 +130,3 @@ abstract class Route(
     val isTopLevel : Boolean = false,
     val isShared : Boolean = false
 )
-
-class NavBarItem<T : Any>(
-    val route: T,
-    val icon: ImageVector,
-    val description: String
-)

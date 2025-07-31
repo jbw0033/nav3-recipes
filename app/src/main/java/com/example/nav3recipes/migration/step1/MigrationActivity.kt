@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.nav3recipes.migration.start
+package com.example.nav3recipes.migration.step1
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -33,6 +33,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,33 +52,27 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import androidx.navigation.toRoute
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
 import com.example.nav3recipes.content.ContentMauve
 import com.example.nav3recipes.content.ContentPink
 import com.example.nav3recipes.content.ContentPurple
 import com.example.nav3recipes.content.ContentRed
+import com.example.nav3recipes.navigator.basic.Route
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
 /**
- * Basic Navigation2 example with the following navigation graph:
+ * Step 1 of migration:
  *
- * A -> A, A1, E
- * B -> B, B1, E
- * C -> C, E
- * D
- *
- * - The starting destination (or home screen) is A.
- * - A, B and C are top level destinations that appear in a navigation bar.
- * - D is a dialog destination.
- * - E is a shared destination that can appear under any of the top level destinations.
- * - Navigating to a top level destination pops all other top level destinations off the stack,
- * except for the start destination.
- * - Navigating back from the start destination exits the app.
- *
- * This will be the starting point for migration to Navigation 3.
+ * - Create your own back stack class (`Navigator`) that mirrors the state of `NavController`'s back
+ * stack.
+ * - Make `Navigator` available everywhere that `NavController` is
+ * - Wrap `NavHost` with a `NavDisplay`
  */
 
 @Serializable private data object BaseRouteA : Route(isTopLevel = true)
@@ -98,7 +94,7 @@ private val TOP_LEVEL_ROUTES = mapOf(
     BaseRouteC to NavBarItem(icon = Icons.Default.Camera, description = "Route C"),
 )
 
-class NavBarItem(
+data class NavBarItem(
     val icon: ImageVector,
     val description: String
 )
@@ -116,6 +112,7 @@ class MigrationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
+            val navigator = remember { Navigator(navController) }
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
             Scaffold(bottomBar = {
@@ -142,24 +139,38 @@ class MigrationActivity : ComponentActivity() {
             })
 
             { paddingValues ->
-                NavHost(
-                    navController = navController,
-                    startDestination = BaseRouteA,
-                    modifier = Modifier.padding(paddingValues)
-                ) {
-                    featureASection(navController)
-                    featureBSection(navController)
-                    featureCSection(navController)
-                    dialog<RouteD> { key ->
-                        Text(modifier = Modifier.background(Color.White), text = "Route D title (dialog)")
+                NavDisplay(
+                    backStack = navigator.backStack,
+                    entryProvider = entryProvider(
+                        fallback = { key ->
+                            NavEntry(key = key) {
+                                NavHost(
+                                    navController = navController,
+                                    startDestination = BaseRouteA,
+                                    modifier = Modifier.padding(paddingValues)
+                                ) {
+                                    featureASection(navController, navigator)
+                                    featureBSection(navController, navigator)
+                                    featureCSection(navController, navigator)
+                                    dialog<RouteD> { key ->
+                                        Text(
+                                            modifier = Modifier.background(Color.White),
+                                            text = "Route D title (dialog)"
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    ) {
+                        // No nav entries added yet.
                     }
-                }
+                )
             }
         }
     }
 }
 
-private fun NavGraphBuilder.featureCSection(navController: NavHostController) {
+private fun NavGraphBuilder.featureCSection(navController: NavHostController, navigator: Navigator) {
     navigation<BaseRouteC>(startDestination = RouteC) {
         composable<RouteC> {
             ContentMauve("Route C title") {
@@ -177,7 +188,7 @@ private fun NavGraphBuilder.featureCSection(navController: NavHostController) {
     }
 }
 
-private fun NavGraphBuilder.featureBSection(navController: NavHostController) {
+private fun NavGraphBuilder.featureBSection(navController: NavHostController, navigator: Navigator) {
     navigation<BaseRouteB>(startDestination = RouteB) {
         composable<RouteB> {
             ContentGreen("Route B title") {
@@ -201,7 +212,7 @@ private fun NavGraphBuilder.featureBSection(navController: NavHostController) {
     }
 }
 
-private fun NavGraphBuilder.featureASection(navController: NavHostController) {
+private fun NavGraphBuilder.featureASection(navController: NavHostController, navigator: Navigator) {
     navigation<BaseRouteA>(startDestination = RouteA) {
         composable<RouteA> {
             ContentRed("Route A title") {

@@ -6,7 +6,7 @@ import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import com.example.nav3recipes.migration.start.MigrationActivity
+import com.example.nav3recipes.migration.step1.MigrationActivity
 import org.junit.Rule
 import org.junit.Test
 

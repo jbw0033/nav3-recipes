@@ -100,7 +100,7 @@
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
-            android:name=".migration.step1.MainActivity"
+            android:name=".migration.step1.MigrationActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
     </application>
