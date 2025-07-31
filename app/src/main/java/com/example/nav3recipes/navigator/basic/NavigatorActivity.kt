@@ -53,11 +53,14 @@ import com.example.nav3recipes.content.ContentPurple
 import com.example.nav3recipes.content.ContentRed
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 
-private abstract class NavBarItem(val icon: ImageVector): Route(isTopLevel = true)
-private data object Home : NavBarItem(icon = Icons.Default.Home)
-private data object ChatList : NavBarItem(icon = Icons.Default.Face)
+private abstract class NavBarItem(
+    val icon: ImageVector,
+    val description: String
+): Route(isTopLevel = true)
+private data object Home : NavBarItem(icon = Icons.Default.Home, description = "Home")
+private data object ChatList : NavBarItem(icon = Icons.Default.Face, description = "Chat list")
 private data object ChatDetail : Route()
-private data object Camera : NavBarItem(icon = Icons.Default.PlayArrow)
+private data object Camera : NavBarItem(icon = Icons.Default.PlayArrow, description = "Camera")
 private data object Search : Route(isShared = true)
 
 private val TOP_LEVEL_ROUTES : List<NavBarItem> = listOf(Home, ChatList, Camera)
@@ -86,7 +89,7 @@ class NavigatorActivity : ComponentActivity() {
                                 icon = {
                                     Icon(
                                         imageVector = topLevelRoute.icon,
-                                        contentDescription = null
+                                        contentDescription = topLevelRoute.description
                                     )
                                 }
                             )

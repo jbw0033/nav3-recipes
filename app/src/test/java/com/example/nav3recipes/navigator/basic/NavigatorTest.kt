@@ -24,7 +24,7 @@ class NavigatorTest {
     fun navigatingToTopLevelRoute_addsRouteToTopOfStack(){
         val navigator = Navigator<Route>(startRoute = A)
         navigator.navigate(B)
-        assertEquals(listOf<Any>(A, B), navigator.backStack)
+        assertEquals(listOf(A, B), navigator.backStack)
     }
 
     @Test
@@ -36,7 +36,7 @@ class NavigatorTest {
     }
 
     @Test
-    fun navigatingToNewTopLevelRoute_popsOtherTopLevelStacks() {
+    fun navigatingToNewTopLevelRoute_popsOtherStacksExceptStartStack() {
         val navigator = Navigator<Route>(startRoute = A)
         navigator.navigate(A1) // [A, A1]
         navigator.navigate(C) // [A, A1, C]

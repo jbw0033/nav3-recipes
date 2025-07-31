@@ -53,6 +53,9 @@ class Navigator<T: Route>(
         startRoute to mutableListOf(startRoute)
     )
 
+    // Maintain a map of shared routes to their parent stacks
+    private var sharedRoutes : MutableMap<T, T> = mutableMapOf()
+
     private fun updateBackStack() =
         backStack.apply {
             clear()
@@ -80,7 +83,7 @@ class Navigator<T: Route>(
 
     private fun clearAllExceptStartStack(){
         // Remove all other top level stacks, except the start stack
-        val startStack = topLevelStacks[startRoute]!!
+        val startStack = topLevelStacks[startRoute] ?: mutableListOf(startRoute)
         topLevelStacks.clear()
         topLevelStacks.put(startRoute, startStack)
     }
@@ -94,11 +97,11 @@ class Navigator<T: Route>(
         } else {
             if (route.isShared){
                 // If the key is already in a stack, remove it
-                topLevelStacks.forEach { stack ->
-                    if (stack.value.contains(route)){
-                        topLevelStacks[stack.key]?.remove(route)
-                    }
+                val oldParent = sharedRoutes[route]
+                if (oldParent != null) {
+                    topLevelStacks[oldParent]?.remove(route)
                 }
+                sharedRoutes[route] = topLevelRoute
             }
             topLevelStacks[topLevelRoute]?.add(route)
         }
@@ -109,6 +112,9 @@ class Navigator<T: Route>(
      * Go back to the previous route.
      */
     fun goBack(){
+        if (backStack.size <= 1){
+            return
+        }
         val removedKey = topLevelStacks[topLevelRoute]?.removeLastOrNull()
         // If the removed key was a top level key, remove the associated top level stack
         topLevelStacks.remove(removedKey)
