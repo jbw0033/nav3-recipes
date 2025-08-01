@@ -31,6 +31,7 @@ class Navigator(
                             null
                         }
                     }
+                    println("Back stack: $entriesToAdd")
                     backStack.addAll(entriesToAdd)
                 }
             }
