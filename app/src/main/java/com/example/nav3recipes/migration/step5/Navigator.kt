@@ -1,4 +1,4 @@
-package com.example.nav3recipes.migration.step4
+package com.example.nav3recipes.migration.step5
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.toRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -160,26 +161,12 @@ class Navigator(
         }
     }
 
-    /**
-     * Navigate to the given route.
-     */
-    fun navigate(route: Any) {
-        add(route)
-        updateBackStack()
+    fun navigate(route: Any, navOptions: NavOptions? = null) {
+        navController.navigate(route, navOptions)
     }
 
-    /**
-     * Go back to the previous route.
-     */
     fun goBack() {
-        if (backStack.size <= 1) {
-            return
-        }
-        val removedKey = topLevelStacks[topLevelRoute]?.removeLastOrNull()
-        // If the removed key was a top level key, remove the associated top level stack
-        topLevelStacks.remove(removedKey)
-        topLevelRoute = topLevelStacks.keys.last()
-        updateBackStack()
+        navController.popBackStack()
     }
 }
 

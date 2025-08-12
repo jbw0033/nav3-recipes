@@ -40,7 +40,7 @@ import kotlinx.serialization.Serializable
  *
  * @see `NavigatorTest`.
  */
-class Navigator<T: Route>(
+class Navigator<T: RouteV2>(
     private val startRoute: T,
     private val canTopLevelRoutesExistTogether: Boolean = false
 ) {

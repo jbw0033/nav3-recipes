@@ -40,3 +40,8 @@ class Navigator(
 
     val backStack = mutableStateListOf<Any>(Unit)
 }
+
+sealed interface Route {
+    interface TopLevel : Route
+    interface Dialog : Route
+}

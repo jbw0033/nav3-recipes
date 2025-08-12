@@ -55,18 +55,18 @@ import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
 
 @Serializable
-private data object Home : Route(isTopLevel = true)
+private data object Home : RouteV2(isTopLevel = true)
 @Serializable
-private data object ChatList : Route(isTopLevel = true)
+private data object ChatList : RouteV2(isTopLevel = true)
 
 @Serializable
-private data object ChatDetail : Route()
+private data object ChatDetail : RouteV2()
 @Serializable
-private data object Camera : Route(isTopLevel = true)
+private data object Camera : RouteV2(isTopLevel = true)
 @Serializable
-private data object Search : Route(isShared = true)
+private data object Search : RouteV2(isShared = true)
 
-private val TOP_LEVEL_ROUTES : List<NavBarItem<Route>> = listOf(
+private val TOP_LEVEL_ROUTES : List<NavBarItem<RouteV2>> = listOf(
     NavBarItem(Home, icon = Icons.Default.Home, description = "Home"),
     NavBarItem(ChatList, icon = Icons.Default.Face, description = "Chat list"),
     NavBarItem(Camera, icon = Icons.Default.PlayArrow, description = "Camera")
@@ -77,7 +77,7 @@ class NavigatorActivity : ComponentActivity() {
         setEdgeToEdgeConfig()
         super.onCreate(savedInstanceState)
         setContent {
-            val navigator = remember { Navigator<Route>(Home) }
+            val navigator = remember { Navigator<RouteV2>(Home) }
 
             Scaffold(
                 topBar = {

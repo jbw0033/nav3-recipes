@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.nav3recipes.migration.step3
+package com.example.nav3recipes.migration.step5
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -42,7 +42,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -50,8 +49,9 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.content.ContentBlue
@@ -65,27 +65,27 @@ import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
 @Serializable
-private data object BaseRouteA
+data object BaseRouteA
 @Serializable
-private data object RouteA : Route.TopLevel
+data object RouteA : Route.TopLevel
 @Serializable
-private data object RouteA1
+data object RouteA1
 
 @Serializable
-private data object BaseRouteB
+data object BaseRouteB
 @Serializable
-private data object RouteB : Route.TopLevel
+data object RouteB : Route.TopLevel
 @Serializable
-private data class RouteB1(val id: String)
+data class RouteB1(val id: String)
 
 @Serializable
-private data object BaseRouteC
+data object BaseRouteC
 @Serializable
-private data object RouteC : Route.TopLevel
+data object RouteC : Route.TopLevel
 @Serializable
-private data object RouteD : Route.Dialog
+data object RouteD : Route.Dialog
 @Serializable
-private data object RouteE
+data object RouteE
 
 private val TOP_LEVEL_ROUTES = mapOf(
     BaseRouteA to NavBarItem(icon = Icons.Default.Home, description = "Route A"),
@@ -98,7 +98,8 @@ data class NavBarItem(
     val description: String
 )
 
-class Step3MigrationActivity : ComponentActivity() {
+
+class Step5MigrationActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setEdgeToEdgeConfig()
@@ -116,7 +117,7 @@ class Step3MigrationActivity : ComponentActivity() {
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
-                                navController.navigate(key, navOptions {
+                                navigator.navigate(key, navOptions {
                                     popUpTo(route = RouteA)
                                 })
                             },
@@ -135,6 +136,7 @@ class Step3MigrationActivity : ComponentActivity() {
             { paddingValues ->
                 NavDisplay(
                     backStack = navigator.backStack,
+                    onBack = { navigator.goBack() },
                     entryProvider = entryProvider(
                         fallback = { key ->
                             NavEntry(key = key) {
@@ -144,18 +146,18 @@ class Step3MigrationActivity : ComponentActivity() {
                                     modifier = Modifier.padding(paddingValues)
                                 ) {
                                     featureASection(
-                                        onSubRouteClick = { navController.navigate(RouteA1) },
-                                        onDialogClick = { navController.navigate(RouteD) },
-                                        onOtherClick = { navController.navigate(RouteE) }
+                                        onSubRouteClick = { navigator.navigate(RouteA1) },
+                                        onDialogClick = { navigator.navigate(RouteD) },
+                                        onOtherClick = { navigator.navigate(RouteE) }
                                     )
-                                    featureBSection(
-                                        onDetailClick = { id -> navController.navigate(RouteB1(id)) },
-                                        onDialogClick = { navController.navigate(RouteD) },
-                                        onOtherClick = { navController.navigate(RouteE) }
-                                    )
+                                    navigation<BaseRouteB>(startDestination = RouteB) {
+                                        composable<RouteB> {}
+                                        composable<RouteB1> {}
+                                        composable<RouteE> {}
+                                    }
                                     featureCSection(
-                                        onDialogClick = { navController.navigate(RouteD) },
-                                        onOtherClick = { navController.navigate(RouteE) }
+                                        onDialogClick = { navigator.navigate(RouteD) },
+                                        onOtherClick = { navigator.navigate(RouteE) }
                                     )
                                     dialog<RouteD> { key ->
                                         Text(
@@ -167,7 +169,11 @@ class Step3MigrationActivity : ComponentActivity() {
                             }
                         }
                     ) {
-                        // No nav entries added yet.
+                        featureBSection(
+                            onDetailClick = { id -> navigator.navigate(RouteB1(id)) },
+                            onDialogClick = { navigator.navigate(RouteD) },
+                            onOtherClick = { navigator.navigate(RouteE) }
+                        )
                     }
                 )
             }
@@ -201,13 +207,12 @@ private fun NavGraphBuilder.featureASection(
     }
 }
 
-private fun NavGraphBuilder.featureBSection(
+private fun EntryProviderBuilder<Any>.featureBSection(
     onDetailClick: (id: String) -> Unit,
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit
 ) {
-    navigation<BaseRouteB>(startDestination = RouteB) {
-        composable<RouteB> {
+        entry<RouteB> {
             ContentGreen("Route B title") {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Button(onClick = { onDetailClick("ABC") }) {
@@ -222,12 +227,11 @@ private fun NavGraphBuilder.featureBSection(
                 }
             }
         }
-        composable<RouteB1> { key ->
-            ContentPurple("Route B1 title. ID: ${key.toRoute<RouteB1>().id}")
+        entry<RouteB1> { key ->
+            ContentPurple("Route B1 title. ID: ${key.id}")
         }
-        composable<RouteE> { ContentBlue("Route E title") }
+        entry<RouteE> { ContentBlue("Route E title") }
     }
-}
 
 private fun NavGraphBuilder.featureCSection(
     onDialogClick: () -> Unit,

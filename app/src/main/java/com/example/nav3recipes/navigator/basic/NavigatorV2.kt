@@ -1,4 +1,4 @@
-package com.example.nav3recipes.migration.step4
+package com.example.nav3recipes.navigator.basic
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
@@ -9,6 +9,10 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.toRoute
+import com.example.nav3recipes.migration.step4.RouteB
+import com.example.nav3recipes.migration.step4.RouteB1
+import com.example.nav3recipes.migration.step4.RouteD
+import com.example.nav3recipes.migration.step4.RouteE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -17,7 +21,7 @@ import kotlinx.coroutines.launch
  * Navigator that mirrors `NavController`'s back stack
  */
 @SuppressLint("RestrictedApi")
-class Navigator(
+class NavigatorV2(
     private val navController: NavHostController,
     private val startRoute: Any = Unit,
     private val canTopLevelRoutesExistTogether: Boolean = false
@@ -140,11 +144,11 @@ class Navigator(
 
     private fun add(route: Any) {
         println("Attempting to add $route")
-        if (route is Route.TopLevel) {
+        if (route is RouteV2.TopLevel) {
             println("$route is a top level route")
             addTopLevel(route)
         } else {
-            if (route is Route.Shared) {
+            if (route is RouteV2.Shared) {
                 println("$route is a shared route")
                 // If the key is already in a stack, remove it
                 val oldParent = sharedRoutes[route]
@@ -183,8 +187,8 @@ class Navigator(
     }
 }
 
-sealed interface Route {
-    interface TopLevel : Route
-    interface Dialog : Route
-    interface Shared : Route
+sealed interface RouteV2 {
+    interface TopLevel : RouteV2
+    interface Dialog : RouteV2
+    interface Shared : RouteV2
 }

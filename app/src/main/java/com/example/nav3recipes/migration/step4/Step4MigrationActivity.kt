@@ -65,34 +65,26 @@ import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
-
 @Serializable
 data object BaseRouteA
-
 @Serializable
 data object RouteA : Route.TopLevel
-
 @Serializable
 data object RouteA1
 
 @Serializable
 data object BaseRouteB
-
 @Serializable
 data object RouteB : Route.TopLevel
-
 @Serializable
 data class RouteB1(val id: String)
 
 @Serializable
 data object BaseRouteC
-
 @Serializable
 data object RouteC : Route.TopLevel
-
 @Serializable
 data object RouteD : Route.Dialog
-
 @Serializable
 data object RouteE
 
@@ -160,9 +152,9 @@ class Step4MigrationActivity : ComponentActivity() {
                                         onOtherClick = { navController.navigate(RouteE) }
                                     )
                                     navigation<BaseRouteB>(startDestination = RouteB) {
-                                        composable<RouteB> { }
-                                        composable<RouteB1> { }
-                                        composable<RouteE> { }
+                                        composable<RouteB> {}
+                                        composable<RouteB1> {}
+                                        composable<RouteE> {}
                                     }
                                     featureCSection(
                                         onDialogClick = { navController.navigate(RouteD) },
@@ -221,26 +213,26 @@ private fun EntryProviderBuilder<Any>.featureBSection(
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit
 ) {
-    entry<RouteB> {
-        ContentGreen("Route B title") {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Button(onClick = { onDetailClick("ABC") }) {
-                    Text("Go to B1")
-                }
-                Button(onClick = onDialogClick) {
-                    Text("Open dialog D")
-                }
-                Button(onClick = onOtherClick) {
-                    Text("Go to E")
+        entry<RouteB> {
+            ContentGreen("Route B title") {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Button(onClick = { onDetailClick("ABC") }) {
+                        Text("Go to B1")
+                    }
+                    Button(onClick = onDialogClick) {
+                        Text("Open dialog D")
+                    }
+                    Button(onClick = onOtherClick) {
+                        Text("Go to E")
+                    }
                 }
             }
         }
+        entry<RouteB1> { key ->
+            ContentPurple("Route B1 title. ID: ${key.id}")
+        }
+        entry<RouteE> { ContentBlue("Route E title") }
     }
-    entry<RouteB1> { key ->
-        ContentPurple("Route B1 title. ID: ${key.id}")
-    }
-    entry<RouteE> { ContentBlue("Route E title") }
-}
 
 private fun NavGraphBuilder.featureCSection(
     onDialogClick: () -> Unit,
