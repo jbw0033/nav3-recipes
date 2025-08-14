@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.example.nav3recipes.migration.step6
+package com.example.nav3recipes.migration.step7
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Face
@@ -32,25 +31,13 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.dialog
-import androidx.navigation.compose.navigation
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderBuilder
-import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.DialogSceneStrategy
@@ -63,24 +50,17 @@ import com.example.nav3recipes.content.ContentPurple
 import com.example.nav3recipes.content.ContentRed
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
-import kotlin.reflect.KClass
 
-@Serializable
-data object BaseRouteA
 @Serializable
 data object RouteA : Route.TopLevel
 @Serializable
 data object RouteA1
 
 @Serializable
-data object BaseRouteB
-@Serializable
 data object RouteB : Route.TopLevel
 @Serializable
 data class RouteB1(val id: String)
 
-@Serializable
-data object BaseRouteC
 @Serializable
 data object RouteC : Route.TopLevel
 @Serializable
@@ -89,9 +69,9 @@ data object RouteD
 data object RouteE : Route.Shared
 
 private val TOP_LEVEL_ROUTES = mapOf(
-    BaseRouteA to NavBarItem(icon = Icons.Default.Home, description = "Route A"),
-    BaseRouteB to NavBarItem(icon = Icons.Default.Face, description = "Route B"),
-    BaseRouteC to NavBarItem(icon = Icons.Default.Camera, description = "Route C"),
+    RouteA to NavBarItem(icon = Icons.Default.Home, description = "Route A"),
+    RouteB to NavBarItem(icon = Icons.Default.Face, description = "Route B"),
+    RouteC to NavBarItem(icon = Icons.Default.Camera, description = "Route C"),
 )
 
 data class NavBarItem(
@@ -100,25 +80,22 @@ data class NavBarItem(
 )
 
 
-class Step6MigrationActivity : ComponentActivity() {
+class Step7MigrationActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setEdgeToEdgeConfig()
         super.onCreate(savedInstanceState)
         setContent {
-            val navController = rememberNavController()
-            val navigator = remember { Navigator(navController) }
-            val currentBackStackEntry by navController.currentBackStackEntryAsState()
+            val navigator = remember { Navigator(startRoute = RouteA, shouldPrintDebugInfo = true) }
 
             Scaffold(bottomBar = {
                 NavigationBar {
                     TOP_LEVEL_ROUTES.forEach { (key, value) ->
-                        val isSelected =
-                            currentBackStackEntry?.destination.isRouteInHierarchy(key::class)
+                        val isSelected = key == navigator.topLevelRoute
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
-                                navController.navigate(key, navOptions {
+                                navigator.navigate(key, navOptions {
                                     popUpTo(route = RouteA)
                                 })
                             },
@@ -139,33 +116,7 @@ class Step6MigrationActivity : ComponentActivity() {
                     backStack = navigator.backStack,
                     onBack = { navigator.goBack() },
                     sceneStrategy = remember { DialogSceneStrategy() },
-                    entryProvider = entryProvider(
-                        fallback = { key ->
-                            NavEntry(key = key) {
-                                NavHost(
-                                    navController = navController,
-                                    startDestination = BaseRouteA,
-                                    modifier = Modifier.padding(paddingValues)
-                                ) {
-                                    navigation<BaseRouteA>(startDestination = RouteA) {
-                                        composable<RouteA> {}
-                                        composable<RouteA1> {}
-                                        composable<RouteE> {}
-                                    }
-                                    navigation<BaseRouteB>(startDestination = RouteB) {
-                                        composable<RouteB> {}
-                                        composable<RouteB1> {}
-                                        composable<RouteE> {}
-                                    }
-                                    navigation<BaseRouteC>(startDestination = RouteC) {
-                                        composable<RouteC> {}
-                                        composable<RouteE> {}
-                                    }
-                                    dialog<RouteD> {}
-                                }
-                            }
-                        }
-                    ) {
+                    entryProvider = entryProvider {
                         featureASection(
                             onSubRouteClick = { navigator.navigate(RouteA1) },
                             onDialogClick = { navigator.navigate(RouteD) },
@@ -259,8 +210,3 @@ private fun EntryProviderBuilder<Any>.featureCSection(
         }
     }
 }
-
-private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
-    this?.hierarchy?.any {
-        it.hasRoute(route)
-    } ?: false
