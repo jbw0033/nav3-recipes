@@ -1,4 +1,4 @@
-package com.example.nav3recipes.migration.step3
+package com.example.nav3recipes.migration.step2
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue

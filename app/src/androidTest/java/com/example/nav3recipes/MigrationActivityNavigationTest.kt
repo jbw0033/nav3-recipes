@@ -1,5 +1,7 @@
 package com.example.nav3recipes
 
+import android.app.Activity
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isSelectable
@@ -11,15 +13,37 @@ import com.example.nav3recipes.migration.start.StartMigrationActivity
 import com.example.nav3recipes.migration.step2.Step2MigrationActivity
 import com.example.nav3recipes.migration.step3.Step3MigrationActivity
 import com.example.nav3recipes.migration.step4.Step4MigrationActivity
+import com.example.nav3recipes.migration.step5.Step5MigrationActivity
+import com.example.nav3recipes.migration.step6.Step6MigrationActivity
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameters
 
+/**
+ * Instrumented navigation tests for each of the migration steps.
+ */
+@RunWith(Parameterized::class)
+class MigrationActivityNavigationTest(activityClass: Class<out ComponentActivity>) {
 
-class MigrationActivityNavigationTest {
-
-    // To test each step in the migration plan, change the Activity name below.
     @get:Rule(order = 0)
-    val composeTestRule = createAndroidComposeRule<Step4MigrationActivity>()
+    val composeTestRule = createAndroidComposeRule(activityClass)
+
+    companion object {
+        @JvmStatic
+        @Parameters(name = "{0}")
+        fun data(): Collection<Array<Any>> {
+            return listOf(
+                /*arrayOf(StartMigrationActivity::class.java),
+                arrayOf(Step2MigrationActivity::class.java),
+                arrayOf(Step3MigrationActivity::class.java),
+                arrayOf(Step4MigrationActivity::class.java),*/
+                arrayOf(Step5MigrationActivity::class.java),
+                /*arrayOf(Step6MigrationActivity::class.java)*/
+            )
+        }
+    }
 
     @Test
     fun firstScreen_isA() {
@@ -121,7 +145,7 @@ class MigrationActivityNavigationTest {
     }
 
     /**
-     * These 2 tests fail and they shouldn't
+     * TODO: Investigate why these 2 dialog tests sometimes fail.
      */
     @Test
     fun navigateToDialogD_onB_showsDialogContentAndDismisses() {

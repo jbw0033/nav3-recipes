@@ -84,9 +84,9 @@ data object BaseRouteC
 @Serializable
 data object RouteC : Route.TopLevel
 @Serializable
-data object RouteD : Route.Dialog
+data object RouteD
 @Serializable
-data object RouteE
+data object RouteE : Route.Shared
 
 private val TOP_LEVEL_ROUTES = mapOf(
     BaseRouteA to NavBarItem(icon = Icons.Default.Home, description = "Route A"),
@@ -138,6 +138,7 @@ class Step6MigrationActivity : ComponentActivity() {
                 NavDisplay(
                     backStack = navigator.backStack,
                     onBack = { navigator.goBack() },
+                    sceneStrategy = remember { DialogSceneStrategy() },
                     entryProvider = entryProvider(
                         fallback = { key ->
                             NavEntry(key = key) {
@@ -239,7 +240,6 @@ private fun EntryProviderBuilder<Any>.featureBSection(
     entry<RouteB1> { key ->
         ContentPurple("Route B1 title. ID: ${key.id}")
     }
-    entry<RouteE> { ContentBlue("Route E title") }
 }
 
 private fun EntryProviderBuilder<Any>.featureCSection(
@@ -258,7 +258,6 @@ private fun EntryProviderBuilder<Any>.featureCSection(
             }
         }
     }
-    entry<RouteE> { ContentBlue("Route E title") }
 }
 
 private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =

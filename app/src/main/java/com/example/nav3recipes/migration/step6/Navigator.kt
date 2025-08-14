@@ -10,6 +10,9 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.toRoute
+import com.example.nav3recipes.migration.step4.RouteB
+import com.example.nav3recipes.migration.step4.RouteB1
+import com.example.nav3recipes.migration.step4.RouteE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -18,10 +21,11 @@ import kotlinx.coroutines.launch
  * Navigator that mirrors `NavController`'s back stack
  */
 @SuppressLint("RestrictedApi")
-class Navigator(
+internal class Navigator(
     private val navController: NavHostController,
     private val startRoute: Any = Unit,
-    private val canTopLevelRoutesExistTogether: Boolean = false
+    private val canTopLevelRoutesExistTogether: Boolean = false,
+    private val shouldPrintDebugInfo: Boolean = false
 ) {
 
     val backStack = mutableStateListOf(startRoute)
@@ -41,7 +45,7 @@ class Navigator(
         coroutineScope.launch {
             navController.currentBackStack.collect { nav2BackStack ->
                 inititalizeTopLevelStacks()
-                println("Top level stacks reset, parsing Nav2 back stack $nav2BackStack")
+                navlog("Top level stacks reset, parsing Nav2 back stack $nav2BackStack")
                 printTopLevelStacks()
 
                 nav2BackStack.forEach { entry ->
@@ -53,17 +57,23 @@ class Navigator(
                                 entry.toRoute<RouteB>()
                             } else if (destination.hasRoute<RouteB1>()) {
                                 entry.toRoute<RouteB1>()
-                            } else if (destination.hasRoute<RouteD>()) {
-                                entry.toRoute<RouteD>()
                             } else if (destination.hasRoute<RouteE>()) {
                                 entry.toRoute<RouteE>()
+                            } else if (destination.hasRoute<RouteA>()) {
+                                entry.toRoute<RouteA>()
+                            } else if (destination.hasRoute<RouteA1>()) {
+                                entry.toRoute<RouteA1>()
+                            } else if (destination.hasRoute<RouteC>()) {
+                                entry.toRoute<RouteC>()
+                            } else if (destination.hasRoute<RouteD>()) {
+                                entry.toRoute<RouteD>()
                             } else {
                                 // Non migrated top level route
                                 entry
                             }
                         add(route)
                     } else {
-                        println("Ignoring $entry")
+                        navlog("Ignoring $entry")
                     }
                 }
                 printTopLevelStacks()
@@ -80,33 +90,36 @@ class Navigator(
         }
         printBackStack()
     }
+    
+    fun navlog(message: String){
+        if (shouldPrintDebugInfo){
+            println(message)
+        }
+    }
 
     private fun printBackStack() {
-        println("Back stack: ")
-        backStack.print()
-        println("---")
+        navlog("Back stack: ${backStack.getDebugString()}")
     }
 
     private fun printTopLevelStacks() {
 
-        println("Top level stacks: ")
+        navlog("Top level stacks: ")
         topLevelStacks.forEach { topLevelStack ->
-            print("${topLevelStack.key} => ")
-            topLevelStack.value.print()
+            navlog("  ${topLevelStack.key} => ${topLevelStack.value.getDebugString()}")
         }
-        println("---")
     }
 
-    private fun List<Any>.print() {
-        print("[")
+    private fun List<Any>.getDebugString() : String {
+        val message = StringBuilder("[")
         forEach { entry ->
             if (entry is NavBackStackEntry){
-                print("Unmigrated route: ${entry.destination.route}, ")
+                message.append("Unmigrated route: ${entry.destination.route}, ")
             } else {
-                print("Migrated route: $entry, ")
+                message.append("Migrated route: $entry, ")
             }
         }
-        print("]\n")
+        message.append("]\n")
+        return message.toString()
     }
 
     private fun addTopLevel(route: Any) {
@@ -122,7 +135,7 @@ class Navigator(
             }
 
             topLevelStacks.put(route, topLevelStack)
-            println("Added top level route $route")
+            navlog("Added top level route $route")
         }
         topLevelRoute = route
     }
@@ -140,13 +153,13 @@ class Navigator(
     }
 
     private fun add(route: Any) {
-        println("Attempting to add $route")
+        navlog("Attempting to add $route")
         if (route is Route.TopLevel) {
-            println("$route is a top level route")
+            navlog("$route is a top level route")
             addTopLevel(route)
         } else {
             if (route is Route.Shared) {
-                println("$route is a shared route")
+                navlog("$route is a shared route")
                 // If the key is already in a stack, remove it
                 val oldParent = sharedRoutes[route]
                 if (oldParent != null) {
@@ -154,24 +167,48 @@ class Navigator(
                 }
                 sharedRoutes[route] = topLevelRoute
             } else {
-                println("$route is a normal route")
+                navlog("$route is a normal route")
             }
             val hasBeenAdded = topLevelStacks[topLevelRoute]?.add(route) ?: false
-            println("Added $route to $topLevelRoute stack: $hasBeenAdded")
+            navlog("Added $route to $topLevelRoute stack: $hasBeenAdded")
         }
     }
 
+    /**
+     * Navigate to the given route.
+     */
     fun navigate(route: Any, navOptions: NavOptions? = null) {
         navController.navigate(route, navOptions)
+
+        // TODO: add instruction on when to uncomment this and remove the line above
+        /*
+        add(route)
+        updateBackStack()
+        */
     }
 
+    /**
+     * Go back to the previous route.
+     */
     fun goBack() {
         navController.popBackStack()
+
+        // TODO: add instruction on when to uncomment this and remove the line above
+        /*
+        if (backStack.size <= 1) {
+            return
+        }
+        val removedKey = topLevelStacks[topLevelRoute]?.removeLastOrNull()
+        // If the removed key was a top level key, remove the associated top level stack
+        topLevelStacks.remove(removedKey)
+        topLevelRoute = topLevelStacks.keys.last()
+        updateBackStack()
+        */
     }
+
 }
 
 sealed interface Route {
     interface TopLevel : Route
-    interface Dialog : Route
     interface Shared : Route
 }

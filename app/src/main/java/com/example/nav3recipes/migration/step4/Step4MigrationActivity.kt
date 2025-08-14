@@ -49,7 +49,6 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import androidx.navigation.toRoute
 import androidx.navigation3.runtime.EntryProviderBuilder
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entry
@@ -68,7 +67,7 @@ import kotlin.reflect.KClass
 @Serializable
 data object BaseRouteA
 @Serializable
-data object RouteA : Route.TopLevel
+data object RouteA
 @Serializable
 data object RouteA1
 
@@ -82,9 +81,9 @@ data class RouteB1(val id: String)
 @Serializable
 data object BaseRouteC
 @Serializable
-data object RouteC : Route.TopLevel
+data object RouteC
 @Serializable
-data object RouteD : Route.Dialog
+data object RouteD
 @Serializable
 data object RouteE
 
@@ -107,7 +106,7 @@ class Step4MigrationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            val navigator = remember { Navigator(navController) }
+            val navigator = remember { Navigator(navController, shouldPrintDebugInfo = true) }
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
             Scaffold(bottomBar = {
@@ -137,7 +136,7 @@ class Step4MigrationActivity : ComponentActivity() {
             { paddingValues ->
                 NavDisplay(
                     backStack = navigator.backStack,
-                    onBack = { navController.popBackStack() },
+                    onBack = { navigator.goBack() },
                     entryProvider = entryProvider(
                         fallback = { key ->
                             NavEntry(key = key) {

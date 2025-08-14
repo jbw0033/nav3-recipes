@@ -42,7 +42,6 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -67,7 +66,7 @@ import kotlin.reflect.KClass
 @Serializable
 private data object BaseRouteA
 @Serializable
-private data object RouteA : Route.TopLevel
+private data object RouteA
 @Serializable
 private data object RouteA1
 
@@ -81,11 +80,11 @@ private data class RouteB1(val id: String)
 @Serializable
 private data object BaseRouteC
 @Serializable
-private data object RouteC : Route.TopLevel
+private data object RouteC
 @Serializable
-private data object RouteD : Route.Dialog
+private data object RouteD
 @Serializable
-private data object RouteE
+private data object RouteE : Route.Shared
 
 private val TOP_LEVEL_ROUTES = mapOf(
     BaseRouteA to NavBarItem(icon = Icons.Default.Home, description = "Route A"),
@@ -135,6 +134,7 @@ class Step3MigrationActivity : ComponentActivity() {
             { paddingValues ->
                 NavDisplay(
                     backStack = navigator.backStack,
+                    onBack = { navigator.goBack() },
                     entryProvider = entryProvider(
                         fallback = { key ->
                             NavEntry(key = key) {

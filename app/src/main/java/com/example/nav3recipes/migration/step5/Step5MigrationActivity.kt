@@ -67,7 +67,7 @@ import kotlin.reflect.KClass
 @Serializable
 data object BaseRouteA
 @Serializable
-data object RouteA : Route.TopLevel
+data object RouteA
 @Serializable
 data object RouteA1
 
@@ -81,9 +81,9 @@ data class RouteB1(val id: String)
 @Serializable
 data object BaseRouteC
 @Serializable
-data object RouteC : Route.TopLevel
+data object RouteC
 @Serializable
-data object RouteD : Route.Dialog
+data object RouteD
 @Serializable
 data object RouteE
 
@@ -106,7 +106,7 @@ class Step5MigrationActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navController = rememberNavController()
-            val navigator = remember { Navigator(navController) }
+            val navigator = remember { Navigator(navController, shouldPrintDebugInfo = true) }
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
             Scaffold(bottomBar = {
@@ -117,7 +117,7 @@ class Step5MigrationActivity : ComponentActivity() {
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
-                                navigator.navigate(key, navOptions {
+                                navController.navigate(key, navOptions {
                                     popUpTo(route = RouteA)
                                 })
                             },
@@ -146,9 +146,9 @@ class Step5MigrationActivity : ComponentActivity() {
                                     modifier = Modifier.padding(paddingValues)
                                 ) {
                                     featureASection(
-                                        onSubRouteClick = { navigator.navigate(RouteA1) },
-                                        onDialogClick = { navigator.navigate(RouteD) },
-                                        onOtherClick = { navigator.navigate(RouteE) }
+                                        onSubRouteClick = { navController.navigate(RouteA1) },
+                                        onDialogClick = { navController.navigate(RouteD) },
+                                        onOtherClick = { navController.navigate(RouteE) }
                                     )
                                     navigation<BaseRouteB>(startDestination = RouteB) {
                                         composable<RouteB> {}
@@ -156,8 +156,8 @@ class Step5MigrationActivity : ComponentActivity() {
                                         composable<RouteE> {}
                                     }
                                     featureCSection(
-                                        onDialogClick = { navigator.navigate(RouteD) },
-                                        onOtherClick = { navigator.navigate(RouteE) }
+                                        onDialogClick = { navController.navigate(RouteD) },
+                                        onOtherClick = { navController.navigate(RouteE) }
                                     )
                                     dialog<RouteD> { key ->
                                         Text(
