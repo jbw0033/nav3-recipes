@@ -4,15 +4,14 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.toRoute
-import com.example.nav3recipes.migration.step4.RouteB
-import com.example.nav3recipes.migration.step4.RouteB1
-import com.example.nav3recipes.migration.step4.RouteE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -21,7 +20,7 @@ import kotlinx.coroutines.launch
  * Navigator that mirrors `NavController`'s back stack
  */
 @SuppressLint("RestrictedApi")
-internal class Navigator(
+class Navigator(
     private val navController: NavHostController,
     private val startRoute: Any = Unit,
     private val canTopLevelRoutesExistTogether: Boolean = false,
@@ -168,7 +167,7 @@ internal class Navigator(
     fun navigate(route: Any, navOptions: NavOptions? = null) {
         navController.navigate(route, navOptions)
 
-        // TODO: add instruction on when to uncomment this and remove the line above
+        // Uncomment the code below and delete the line as per migration guide
         /*
         add(route)
         updateBackStack()
@@ -181,7 +180,7 @@ internal class Navigator(
     fun goBack() {
         navController.popBackStack()
 
-        // TODO: add instruction on when to uncomment this and remove the line above
+        // Uncomment the code below and delete the line as per migration guide
         /*
         if (backStack.size <= 1) {
             return
