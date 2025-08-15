@@ -67,6 +67,10 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
+            android:name=".dialog.DialogActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Nav3Recipes"/>
+        <activity
             android:name=".scenes.materiallistdetail.MaterialListDetailActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>

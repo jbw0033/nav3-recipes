@@ -9,11 +9,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,6 +23,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.nav3recipes.animations.AnimatedActivity
 import com.example.nav3recipes.basic.BasicActivity
@@ -28,6 +31,7 @@ import com.example.nav3recipes.basicdsl.BasicDslActivity
 import com.example.nav3recipes.basicsaveable.BasicSaveableActivity
 import com.example.nav3recipes.commonui.CommonUiActivity
 import com.example.nav3recipes.conditional.ConditionalActivity
+import com.example.nav3recipes.dialog.DialogActivity
 import com.example.nav3recipes.modular.hilt.ModularActivity
 import com.example.nav3recipes.passingarguments.basicviewmodels.BasicViewModelsActivity
 import com.example.nav3recipes.passingarguments.injectedviewmodels.InjectedViewModelsActivity
@@ -43,18 +47,30 @@ private class Recipe(
     val activityClass: Class<out Activity>
 )
 
+private class Heading(val name: String)
+
 private val recipes = listOf(
+    Heading("Basic API recipes"),
     Recipe("Basic", BasicActivity::class.java),
     Recipe("Basic DSL", BasicDslActivity::class.java),
     Recipe("Basic Saveable", BasicSaveableActivity::class.java),
-    Recipe("Animations", AnimatedActivity::class.java),
-    Recipe("Conditional navigation", ConditionalActivity::class.java),
-    Recipe("Common UI", CommonUiActivity::class.java),
+
+    Heading("Layouts and animations"),
     Recipe("Material list-detail layout", MaterialListDetailActivity::class.java),
-    Recipe("Two pane layout", TwoPaneActivity::class.java),
+    Recipe("Dialog", DialogActivity::class.java),
+    Recipe("Two pane layout (custom scene)", TwoPaneActivity::class.java),
+    Recipe("Animations", AnimatedActivity::class.java),
+
+    Heading("Common use cases"),
+    Recipe("Common UI", CommonUiActivity::class.java),
+    Recipe("Conditional navigation", ConditionalActivity::class.java),
+
+    Heading("Architecture"),
+    Recipe("Modular Navigation", ModularActivity::class.java),
+
+    Heading("Passing navigation arguments"),
     Recipe("Argument passing to basic ViewModel", BasicViewModelsActivity::class.java),
     Recipe("Argument passing to injected ViewModel", InjectedViewModelsActivity::class.java),
-    Recipe("Modular Navigation", ModularActivity::class.java),
 )
 
 class RecipePickerActivity : ComponentActivity() {
@@ -74,28 +90,45 @@ class RecipePickerActivity : ComponentActivity() {
                         )
                     )
                 }) { innerPadding ->
-                RecipeListView(padding = innerPadding)
+                RecipeList(padding = innerPadding)
             }
         }
     }
 
 
     @Composable
-    fun RecipeListView(padding: PaddingValues) {
+    fun RecipeList(padding: PaddingValues) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(recipes) { recipe ->
-                ListItem(
-                    headlineContent = { Text(recipe.name) },
-                    modifier = Modifier.clickable {
-                        recipe.start()
+            items(recipes) { item ->
+                when(item){
+                    is Recipe -> {
+                        ListItem(
+                            headlineContent = { Text(item.name) },
+                            modifier = Modifier.clickable {
+                                item.start()
+                            }
+                        )
                     }
-                )
+                    is Heading -> {
+                        ListItem(
+                            headlineContent = {
+                                Text(
+                                    text = item.name,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            modifier = Modifier.height(48.dp),
+                            colors = ListItemDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        )
+                    }
+                }
             }
         }
     }
