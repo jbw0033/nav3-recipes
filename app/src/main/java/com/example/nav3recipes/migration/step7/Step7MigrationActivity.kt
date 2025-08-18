@@ -33,14 +33,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderBuilder
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.DialogSceneStrategy
@@ -86,19 +83,14 @@ data class NavBarItem(
 
 class Step7MigrationActivity : ComponentActivity() {
 
-    private val navigator = Navigator(startRoute = RouteA, shouldPrintDebugInfo = true)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         setEdgeToEdgeConfig()
         super.onCreate(savedInstanceState)
 
-        savedStateRegistry.registerSavedStateProvider(Navigator.KEY_PROVIDER, navigator)
-        val restoredState = savedStateRegistry.consumeRestoredStateForKey(Navigator.KEY_PROVIDER)
-        if (restoredState != null) {
-            navigator.restore(restoredState)
-        }
-
         setContent {
+
+            val navigator = rememberNavigator(startRoute = RouteA, shouldPrintDebugInfo = true)
+
             Scaffold(bottomBar = {
                 NavigationBar {
                     TOP_LEVEL_ROUTES.forEach { (key, value) ->

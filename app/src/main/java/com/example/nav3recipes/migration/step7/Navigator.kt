@@ -1,24 +1,29 @@
 package com.example.nav3recipes.migration.step7
 
 import android.annotation.SuppressLint
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.savedstate.SavedState
-import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.read
 import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import androidx.savedstate.write
 import kotlinx.serialization.Serializable
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.iterator
 
 @SuppressLint("RestrictedApi")
-internal class Navigator (
+class Navigator (
     private var startRoute: Route,
     private var canTopLevelRoutesExistTogether: Boolean = false,
     private var shouldPrintDebugInfo: Boolean = false,
-) : SavedStateRegistry.SavedStateProvider {
+) {
 
     val backStack = mutableStateListOf(startRoute)
     var topLevelRoute by mutableStateOf(startRoute)
@@ -135,80 +140,7 @@ internal class Navigator (
         updateBackStack()
     }
 
-    override fun saveState() : SavedState {
-        val savedState = SavedState()
-        savedState.write {
-
-            putSavedState(KEY_START_ROUTE, encodeToSavedState(startRoute))
-            putBoolean(KEY_CAN_TOP_LEVEL_ROUTES_EXIST_TOGETHER, canTopLevelRoutesExistTogether)
-            putBoolean(KEY_SHOULD_PRINT_DEBUG_INFO, shouldPrintDebugInfo)
-            putSavedState(KEY_TOP_LEVEL_ROUTE, encodeToSavedState(topLevelRoute))
-
-            // Create lists for each top level stack. Example:
-            // top_level_stack_ids = [1, 2, 3]
-            // top_level_stack_key_1 = [encodedStateA]
-            // top_level_stack_values_1 = [encodedStateA, encodedStateA1]
-            // top_level_stack_key_2 = ...
-
-            var id = 0
-            val ids = mutableListOf<Int>()
-
-            for ((key, stackValues) in topLevelStacks){
-                putSavedState("$KEY_TOP_LEVEL_STACK_KEY_PREFIX$id", encodeToSavedState(key))
-                putSavedStateList("$KEY_TOP_LEVEL_STACK_VALUES_PREFIX$id", stackValues.map { encodeToSavedState(it) })
-                ids.add(id)
-                id++
-            }
-
-            putIntList(KEY_TOP_LEVEL_STACK_IDS, ids)
-
-            val sharedRouteKeys = sharedRoutes.keys.toList()
-            val sharedRouteValues = sharedRoutes.values.toList()
-            putSavedStateList(KEY_SHARED_ROUTES_KEYS, sharedRouteKeys.map { encodeToSavedState(it) })
-            putSavedStateList(KEY_SHARED_ROUTES_VALUES, sharedRouteValues.map { encodeToSavedState(it) })
-        }
-        return savedState
-    }
-
-    fun restore(savedState: SavedState) {
-
-        savedState.read {
-            startRoute = decodeFromSavedState(getSavedState(KEY_START_ROUTE))
-            canTopLevelRoutesExistTogether = getBoolean(KEY_CAN_TOP_LEVEL_ROUTES_EXIST_TOGETHER)
-            topLevelRoute = decodeFromSavedState(getSavedState(KEY_TOP_LEVEL_ROUTE))
-
-            val ids = getIntList(KEY_TOP_LEVEL_STACK_IDS)
-            for (id in ids){
-                // get the key and the value list
-                val key : Route = decodeFromSavedState(getSavedState("$KEY_TOP_LEVEL_STACK_KEY_PREFIX$id"))
-                val stackValues = getSavedStateList("$KEY_TOP_LEVEL_STACK_VALUES_PREFIX$id")
-                    .map { decodeFromSavedState<Route>(it)}
-                topLevelStacks[key] = stackValues.toMutableList()
-
-            }
-
-            val encodedSharedRouteKeys = getSavedStateListOrNull(KEY_SHARED_ROUTES_KEYS)
-            val encodedSharedRouteValues = getSavedStateListOrNull(KEY_SHARED_ROUTES_VALUES)
-
-            if (encodedSharedRouteKeys != null &&
-                encodedSharedRouteValues != null &&
-                encodedSharedRouteKeys.size == encodedSharedRouteValues.size) {
-                val restoredKeys = encodedSharedRouteKeys.map { decodeFromSavedState<Route>(it) }
-                val restoredValues = encodedSharedRouteValues.map { decodeFromSavedState<Route>(it) }
-                sharedRoutes.clear()
-                for (i in restoredKeys.indices) {
-                    sharedRoutes[restoredKeys[i]] = restoredValues[i]
-                }
-            }
-
-            updateBackStack()
-        }
-    }
-
-
     companion object {
-
-        const val KEY_PROVIDER = "navigator_saved_state_provider"
         private const val KEY_START_ROUTE = "start_route"
         private const val KEY_CAN_TOP_LEVEL_ROUTES_EXIST_TOGETHER = "can_top_level_routes_exist_together"
         private const val KEY_SHOULD_PRINT_DEBUG_INFO = "should_print_debug_info"
@@ -216,12 +148,99 @@ internal class Navigator (
         private const val KEY_TOP_LEVEL_STACK_IDS = "top_level_stack_ids"
         private const val KEY_TOP_LEVEL_STACK_KEY_PREFIX = "top_level_stack_key_"
         private const val KEY_TOP_LEVEL_STACK_VALUES_PREFIX = "top_level_stack_values_"
-        private const val KEY_SHARED_ROUTES = "shared_routes" // This was the old, unused key
         private const val KEY_SHARED_ROUTES_KEYS = "shared_routes_keys"
         private const val KEY_SHARED_ROUTES_VALUES = "shared_routes_values"
 
-    }
+        val Saver = Saver<Navigator, SavedState>(
+            save = { navigator ->
+                val savedState = SavedState()
+                savedState.write {
 
+                    putSavedState(KEY_START_ROUTE, encodeToSavedState(navigator.startRoute))
+                    putBoolean(KEY_CAN_TOP_LEVEL_ROUTES_EXIST_TOGETHER, navigator.canTopLevelRoutesExistTogether)
+                    putBoolean(KEY_SHOULD_PRINT_DEBUG_INFO, navigator.shouldPrintDebugInfo)
+                    putSavedState(KEY_TOP_LEVEL_ROUTE, encodeToSavedState(navigator.topLevelRoute))
+
+                    // Create lists for each top level stack. Example:
+                    // top_level_stack_ids = [1, 2, 3]
+                    // top_level_stack_key_1 = [encodedStateA]
+                    // top_level_stack_values_1 = [encodedStateA, encodedStateA1]
+                    // top_level_stack_key_2 = ...
+
+                    var id = 0
+                    val ids = mutableListOf<Int>()
+
+                    for ((key, stackValues) in navigator.topLevelStacks){
+                        putSavedState("$KEY_TOP_LEVEL_STACK_KEY_PREFIX$id", encodeToSavedState(key))
+                        putSavedStateList("$KEY_TOP_LEVEL_STACK_VALUES_PREFIX$id", stackValues.map { encodeToSavedState(it) })
+                        ids.add(id)
+                        id++
+                    }
+
+                    putIntList(KEY_TOP_LEVEL_STACK_IDS, ids)
+
+                    val sharedRouteKeys = navigator.sharedRoutes.keys.toList()
+                    val sharedRouteValues = navigator.sharedRoutes.values.toList()
+                    putSavedStateList(KEY_SHARED_ROUTES_KEYS, sharedRouteKeys.map { encodeToSavedState(it) })
+                    putSavedStateList(KEY_SHARED_ROUTES_VALUES, sharedRouteValues.map { encodeToSavedState(it) })
+                }
+                savedState
+            },
+            restore = { savedState ->
+                savedState.read {
+                    val restoredStartRoute = decodeFromSavedState<Route>(getSavedState(KEY_START_ROUTE))
+                    val restoredCanTopLevelRoutesExistTogether = getBoolean(KEY_CAN_TOP_LEVEL_ROUTES_EXIST_TOGETHER)
+                    val restoredShouldPrintDebugInfo = getBoolean(KEY_SHOULD_PRINT_DEBUG_INFO)
+
+                    val navigator = Navigator(
+                        startRoute = restoredStartRoute,
+                        canTopLevelRoutesExistTogether = restoredCanTopLevelRoutesExistTogether,
+                        shouldPrintDebugInfo = restoredShouldPrintDebugInfo
+                    )
+
+                    navigator.topLevelRoute = decodeFromSavedState(getSavedState(KEY_TOP_LEVEL_ROUTE))
+
+                    val ids = getIntList(KEY_TOP_LEVEL_STACK_IDS)
+                    for (id in ids){
+                        // get the key and the value list
+                        val key : Route = decodeFromSavedState(getSavedState("$KEY_TOP_LEVEL_STACK_KEY_PREFIX$id"))
+                        val stackValues = getSavedStateList("$KEY_TOP_LEVEL_STACK_VALUES_PREFIX$id")
+                            .map { decodeFromSavedState<Route>(it)}
+                        navigator.topLevelStacks[key] = stackValues.toMutableList()
+                    }
+
+                    val encodedSharedRouteKeys = getSavedStateListOrNull(KEY_SHARED_ROUTES_KEYS)
+                    val encodedSharedRouteValues = getSavedStateListOrNull(KEY_SHARED_ROUTES_VALUES)
+
+                    if (encodedSharedRouteKeys != null &&
+                        encodedSharedRouteValues != null &&
+                        encodedSharedRouteKeys.size == encodedSharedRouteValues.size) {
+                        val restoredKeys = encodedSharedRouteKeys.map { decodeFromSavedState<Route>(it) }
+                        val restoredValues = encodedSharedRouteValues.map { decodeFromSavedState<Route>(it) }
+                        navigator.sharedRoutes.clear()
+                        for (i in restoredKeys.indices) {
+                            navigator.sharedRoutes[restoredKeys[i]] = restoredValues[i]
+                        }
+                    }
+                    navigator.updateBackStack()
+                    navigator
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun rememberNavigator(
+    startRoute: Route,
+    canTopLevelRoutesExistTogether: Boolean = false,
+    shouldPrintDebugInfo: Boolean = false
+) = rememberSaveable(saver = Navigator.Saver){
+    Navigator(
+        startRoute = startRoute,
+        canTopLevelRoutesExistTogether = canTopLevelRoutesExistTogether,
+        shouldPrintDebugInfo = shouldPrintDebugInfo
+    )
 }
 
 @Serializable

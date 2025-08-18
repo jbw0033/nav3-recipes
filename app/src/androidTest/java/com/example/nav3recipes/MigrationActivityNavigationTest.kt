@@ -1,6 +1,5 @@
 package com.example.nav3recipes
 
-import android.app.Activity
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
@@ -135,6 +134,9 @@ class MigrationActivityNavigationTest(activityClass: Class<out ComponentActivity
         }
     }
 
+    /**
+     * TODO: Investigate why these dialog tests sometimes fail.
+     */
     @Test
     fun navigateToDialogD_onA_showsDialogContentAndDismisses() {
         composeTestRule.apply {
@@ -146,9 +148,6 @@ class MigrationActivityNavigationTest(activityClass: Class<out ComponentActivity
         }
     }
 
-    /**
-     * TODO: Investigate why these 2 dialog tests sometimes fail.
-     */
     @Test
     fun navigateToDialogD_onB_showsDialogContentAndDismisses() {
         composeTestRule.apply {
@@ -175,6 +174,4 @@ class MigrationActivityNavigationTest(activityClass: Class<out ComponentActivity
             onNodeWithText("Route C title").assertExists()
         }
     }
-
-
 }
