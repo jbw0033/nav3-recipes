@@ -24,8 +24,8 @@ val backstack = remember { mutableStateListOf<Any>(MyKey) }
 Navigation 2:
 ```
 NavHost(navController, "myGraph", "profile") {
-  composeable("profile") { /* content */ }
-  composeable("friends") {...}
+  composable("profile") { /* content */ }
+  composable("friends") {...}
 }
 ```
 
@@ -85,7 +85,10 @@ navController.popBackStack(Route2, false)
 
 Navigation3:
 ```
-backstack.dropLastWhile { it != Route2 }
+val index = backstack.lastIndexOf(Route2)
+if (index != -1) {
+    backstack.removeRange(index + 1, backstack.size)
+}
 ```
 
 ## Handle a failed pop back
@@ -118,7 +121,7 @@ if (backstack.size > 1) {
 NavDisplay(backstack) { }
 ```
 
-## Pop up to a destination the navigate
+## Pop up to a destination then navigate
 
 Navigation 2:
 ```
@@ -132,7 +135,11 @@ navController.navigate(
 
 Navigation3:
 ```
-backstack.dropLastWhile { it != "root" }.add(route)
+val index = backstack.lastIndexOf("root")
+if (index != -1) {
+    backstack.removeRange(index + 1, backstack.size)
+}
+backstack.add(route)
 ```
 
 ## Save state when popping up
@@ -237,7 +244,7 @@ val backStack = remember { mutableStateListOf<Any>(Home) }
 
 NavDisplay(backStack, sceneStrategy = DialogSceneStrategy<Any>()) {
   when(it) {
-    Home -> NavEntry(it, metadata = metadata = DialogSceneStrategy.dialog()) {
+    Home -> NavEntry(it, metadata = DialogSceneStrategy.dialog()) {
       // content for the dialog
     }
   }
@@ -471,7 +478,7 @@ SharedTransitionLayout {
           .clickable(
             onClick = {
               selectFirst.value = !selectFirst.value
-              navController.navigate(BlueBox)
+              backstack.add(BlueBox)
             }
           )
           .background(Color.Red)
@@ -490,7 +497,7 @@ SharedTransitionLayout {
             .clickable(
               onClick = {
                 selectFirst.value = !selectFirst.value
-                navController.popBackStack()
+                backstack.removeLast()
               }
             )
             .alpha(0.5f)
@@ -560,7 +567,12 @@ Navigation 2:
 ```
 NavHost(...) {
   composable(..., 
-    deepLinks = listOf(navDeepLink { action = "action" mimeType = "type" })
+    deepLinks = listOf(
+      navDeepLink {
+        action = "action"
+        mimeType = "type"
+      }
+    )
   ) {
 
   }
@@ -672,7 +684,7 @@ val navBackStack =
     backStack + loginStack
   }
 
-*NavDisplay(
+NavDisplay(
   backStack = navBackStack,
   modifier = Modifier.padding(paddingValues),
   onBack = { backStack.removeLastOrNull() },
@@ -727,8 +739,11 @@ Navigation3:
 entry("c") {
   DestinationC(
     onNavigateToA = {
-      backstack.dropLastWhile { it != "a"}
-      backstack.removeLast()
+      val index = backstack.lastIndexOf("a")
+      if (index != -1) {
+          // Pop up to and including "a"
+          backstack.removeRange(index, backstack.size)
+      }
       backstack.add("a")
     },
   )
@@ -1072,7 +1087,7 @@ class NavigationTest {
 Navigation 2:
 ```
 NavHost(navController, Graph, Profile) {
-  composeable(Profile) { AndroidFragment<ProfileFragment>() }
+  composable(Profile) { AndroidFragment<ProfileFragment>() }
 }
 ```
 
