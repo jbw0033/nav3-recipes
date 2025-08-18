@@ -106,9 +106,7 @@ class Step7MigrationActivity : ComponentActivity() {
                         NavigationBarItem(
                             selected = isSelected,
                             onClick = {
-                                navigator.navigate(key, navOptions {
-                                    popUpTo(route = RouteA)
-                                })
+                                navigator.navigate(key)
                             },
                             icon = {
                                 Icon(

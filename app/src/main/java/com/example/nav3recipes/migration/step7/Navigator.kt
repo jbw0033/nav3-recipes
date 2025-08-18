@@ -1,15 +1,10 @@
 package com.example.nav3recipes.migration.step7
 
 import android.annotation.SuppressLint
-import androidx.collection.mutableIntListOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavOptions
-import androidx.navigation3.runtime.NavKey
 import androidx.savedstate.SavedState
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.read
@@ -17,10 +12,6 @@ import androidx.savedstate.serialization.decodeFromSavedState
 import androidx.savedstate.serialization.encodeToSavedState
 import androidx.savedstate.write
 import kotlinx.serialization.Serializable
-import kotlin.collections.MutableMap
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
 
 @SuppressLint("RestrictedApi")
 internal class Navigator (
@@ -66,14 +57,10 @@ internal class Navigator (
         }
     }
 
-    private fun List<Any>.getDebugString() : String {
+    private fun List<Route>.getDebugString() : String {
         val message = StringBuilder("[")
         forEach { entry ->
-            if (entry is NavBackStackEntry){
-                message.append("Unmigrated route: ${entry.destination.route}, ")
-            } else {
-                message.append("Migrated route: $entry, ")
-            }
+            message.append("Route: $entry, ")
         }
         message.append("]\n")
         return message.toString()
@@ -129,7 +116,7 @@ internal class Navigator (
     /**
      * Navigate to the given route.
      */
-    fun navigate(route: Route, navOptions: NavOptions? = null) {
+    fun navigate(route: Route) {
         add(route)
         updateBackStack()
     }
