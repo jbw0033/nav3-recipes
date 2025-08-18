@@ -21,6 +21,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Face
@@ -32,12 +33,14 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.DialogSceneStrategy
@@ -51,24 +54,25 @@ import com.example.nav3recipes.content.ContentRed
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
 
-@Serializable
-data object RouteA : Route.TopLevel
-@Serializable
-data object RouteA1
 
 @Serializable
-data object RouteB : Route.TopLevel
+data object RouteA : Route.TopLevel()
 @Serializable
-data class RouteB1(val id: String)
+data object RouteA1 : Route()
 
 @Serializable
-data object RouteC : Route.TopLevel
+data object RouteB : Route.TopLevel()
 @Serializable
-data object RouteD
-@Serializable
-data object RouteE : Route.Shared
+data class RouteB1(val id: String) : Route()
 
-private val TOP_LEVEL_ROUTES = mapOf(
+@Serializable
+data object RouteC : Route.TopLevel()
+@Serializable
+data object RouteD : Route()
+@Serializable
+data object RouteE : Route.Shared()
+
+private val TOP_LEVEL_ROUTES = mapOf<Route, NavBarItem>(
     RouteA to NavBarItem(icon = Icons.Default.Home, description = "Route A"),
     RouteB to NavBarItem(icon = Icons.Default.Face, description = "Route B"),
     RouteC to NavBarItem(icon = Icons.Default.Camera, description = "Route C"),
@@ -82,12 +86,19 @@ data class NavBarItem(
 
 class Step7MigrationActivity : ComponentActivity() {
 
+    private val navigator = Navigator(startRoute = RouteA, shouldPrintDebugInfo = true)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setEdgeToEdgeConfig()
         super.onCreate(savedInstanceState)
-        setContent {
-            val navigator = remember { Navigator(startRoute = RouteA, shouldPrintDebugInfo = true) }
 
+        savedStateRegistry.registerSavedStateProvider(Navigator.KEY_PROVIDER, navigator)
+        val restoredState = savedStateRegistry.consumeRestoredStateForKey(Navigator.KEY_PROVIDER)
+        if (restoredState != null) {
+            navigator.restore(restoredState)
+        }
+
+        setContent {
             Scaffold(bottomBar = {
                 NavigationBar {
                     TOP_LEVEL_ROUTES.forEach { (key, value) ->
@@ -137,14 +148,15 @@ class Step7MigrationActivity : ComponentActivity() {
                                 text = "Route D title (dialog)"
                             )
                         }
-                    }
+                    },
+                    modifier = Modifier.padding(paddingValues)
                 )
             }
         }
     }
 }
 
-private fun EntryProviderBuilder<Any>.featureASection(
+private fun EntryProviderBuilder<Route>.featureASection(
     onSubRouteClick: () -> Unit,
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit,
@@ -168,7 +180,7 @@ private fun EntryProviderBuilder<Any>.featureASection(
     entry<RouteE> { ContentBlue("Route E title") }
 }
 
-private fun EntryProviderBuilder<Any>.featureBSection(
+private fun EntryProviderBuilder<Route>.featureBSection(
     onDetailClick: (id: String) -> Unit,
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit
@@ -193,7 +205,7 @@ private fun EntryProviderBuilder<Any>.featureBSection(
     }
 }
 
-private fun EntryProviderBuilder<Any>.featureCSection(
+private fun EntryProviderBuilder<Route>.featureCSection(
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit,
 ) {

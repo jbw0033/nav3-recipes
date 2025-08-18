@@ -80,16 +80,21 @@ import kotlin.reflect.KClass
  * @see `MigrationActivityNavigationTest` for instrumented tests that verify this behavior.
  */
 
+// Feature module A
 @Serializable private data object BaseRouteA
 @Serializable private data object RouteA
 @Serializable private data object RouteA1
 
+// Feature module B
 @Serializable private data object BaseRouteB
 @Serializable private data object RouteB
 @Serializable private data class RouteB1(val id: String)
 
+// Feature module C
 @Serializable private data object BaseRouteC
 @Serializable private data object RouteC
+
+// Common UI modules
 @Serializable private data object RouteD
 @Serializable private data object RouteE
 
@@ -165,6 +170,7 @@ class StartMigrationActivity : ComponentActivity() {
     }
 }
 
+// Feature module A
 private fun NavGraphBuilder.featureASection(
     onSubRouteClick: () -> Unit,
     onDialogClick: () -> Unit,
@@ -191,6 +197,7 @@ private fun NavGraphBuilder.featureASection(
     }
 }
 
+// Feature module B
 private fun NavGraphBuilder.featureBSection(
     onDetailClick: (id: String) -> Unit,
     onDialogClick: () -> Unit,
@@ -219,6 +226,7 @@ private fun NavGraphBuilder.featureBSection(
     }
 }
 
+// Feature module C
 private fun NavGraphBuilder.featureCSection(
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit,
