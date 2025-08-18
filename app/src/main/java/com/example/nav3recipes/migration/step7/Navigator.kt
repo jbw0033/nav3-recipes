@@ -62,7 +62,7 @@ internal class Navigator (
         forEach { entry ->
             message.append("Route: $entry, ")
         }
-        message.append("]\n")
+        message.append("]")
         return message.toString()
     }
 
@@ -162,8 +162,10 @@ internal class Navigator (
 
             putIntList(KEY_TOP_LEVEL_STACK_IDS, ids)
 
-            // TODO
-            // putSavedStateList(KEY_SHARED_ROUTES, sharedRoutes.map { encodeToSavedState(it) })
+            val sharedRouteKeys = sharedRoutes.keys.toList()
+            val sharedRouteValues = sharedRoutes.values.toList()
+            putSavedStateList(KEY_SHARED_ROUTES_KEYS, sharedRouteKeys.map { encodeToSavedState(it) })
+            putSavedStateList(KEY_SHARED_ROUTES_VALUES, sharedRouteValues.map { encodeToSavedState(it) })
         }
         return savedState
     }
@@ -185,8 +187,19 @@ internal class Navigator (
 
             }
 
-            // TODO implement saving and restoring of shared routes (job for AI surely)
-            //sharedRoutes = getSavedStateList(KEY_SHARED_ROUTES).map { decodeFromSavedState<Any>(it) }
+            val encodedSharedRouteKeys = getSavedStateListOrNull(KEY_SHARED_ROUTES_KEYS)
+            val encodedSharedRouteValues = getSavedStateListOrNull(KEY_SHARED_ROUTES_VALUES)
+
+            if (encodedSharedRouteKeys != null &&
+                encodedSharedRouteValues != null &&
+                encodedSharedRouteKeys.size == encodedSharedRouteValues.size) {
+                val restoredKeys = encodedSharedRouteKeys.map { decodeFromSavedState<Route>(it) }
+                val restoredValues = encodedSharedRouteValues.map { decodeFromSavedState<Route>(it) }
+                sharedRoutes.clear()
+                for (i in restoredKeys.indices) {
+                    sharedRoutes[restoredKeys[i]] = restoredValues[i]
+                }
+            }
 
             updateBackStack()
         }
@@ -203,7 +216,9 @@ internal class Navigator (
         private const val KEY_TOP_LEVEL_STACK_IDS = "top_level_stack_ids"
         private const val KEY_TOP_LEVEL_STACK_KEY_PREFIX = "top_level_stack_key_"
         private const val KEY_TOP_LEVEL_STACK_VALUES_PREFIX = "top_level_stack_values_"
-        private const val KEY_SHARED_ROUTES = "shared_routes"
+        private const val KEY_SHARED_ROUTES = "shared_routes" // This was the old, unused key
+        private const val KEY_SHARED_ROUTES_KEYS = "shared_routes_keys"
+        private const val KEY_SHARED_ROUTES_VALUES = "shared_routes_values"
 
     }
 
@@ -214,6 +229,3 @@ sealed class Route {
     sealed class TopLevel : Route()
     sealed class Shared : Route()
 }
-
-
-
