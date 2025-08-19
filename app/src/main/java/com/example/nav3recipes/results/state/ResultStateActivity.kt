@@ -26,8 +26,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
@@ -36,7 +38,17 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.nav3recipes.results.LocalResultStore
+import com.example.nav3recipes.results.ResultStore
 import kotlinx.serialization.Serializable
+
+/**
+ * This recipe demonstrates passing an state result to a previous screen. It does this by:
+ *
+ * - Providing a [ResultStore]
+ * - Calling [ResultStore.getResultState] in the receiving screen
+ * - Calling [ResultStore.setResult] from the sending screen.
+ */
 
 @Serializable
 data object Home : NavKey
@@ -50,8 +62,9 @@ class ResultStateActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val resultStore = remember { ResultStore() }
+            CompositionLocalProvider(LocalResultStore.provides(resultStore)) {
             Scaffold { paddingValues ->
-                var result by rememberResult<Name?>(defaultValue = null)
                 val backStack = rememberNavBackStack(Home)
 
                 NavDisplay(
@@ -62,7 +75,7 @@ class ResultStateActivity : ComponentActivity() {
                         when (key) {
                             is Home -> NavEntry(key) {
                                 val viewModel = viewModel<HomeViewModel>(key = Home.toString())
-                                viewModel.name = result
+                                viewModel.name = resultStore.getResultState<Name?>()
 
                                 Column {
                                     Text("Welcome to Nav3")
@@ -86,7 +99,7 @@ class ResultStateActivity : ComponentActivity() {
                                     )
 
                                     Button(onClick = {
-                                        result = state.text.toString()
+                                        resultStore.setResult<Name>(result = state.text.toString())
                                         backStack.removeLastOrNull()
                                     }) {
                                         Text("Return result")
@@ -98,12 +111,13 @@ class ResultStateActivity : ComponentActivity() {
                     }
                 )
             }
+                }
         }
     }
 }
 
 class HomeViewModel : ViewModel() {
-    var name by mutableStateOf<String?>(null)
+    var name by mutableStateOf<Name?>(null)
 }
 
 typealias Name = String

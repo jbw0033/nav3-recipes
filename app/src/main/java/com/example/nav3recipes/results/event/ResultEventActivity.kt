@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
@@ -37,7 +38,19 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.nav3recipes.results.LocalResultStore
+import com.example.nav3recipes.results.ResultEffect
+import com.example.nav3recipes.results.ResultStore
 import kotlinx.serialization.Serializable
+
+/**
+ * This recipe demonstrates passing an event result to a previous screen. It does this by:
+ *
+ * - Providing a [ResultStore]
+ * - Implementing a [ResultEffect] in the receiving screen
+ * - Calling [ResultStore.sendResult] from the sending screen.
+ */
+
 
 @Serializable
 data object Home : NavKey
@@ -51,7 +64,7 @@ class ResultEventActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val resultStore = LocalResultStore.current
+            val resultStore = remember { ResultStore() }
             CompositionLocalProvider(LocalResultStore.provides(resultStore)) {
                 Scaffold { paddingValues ->
 
