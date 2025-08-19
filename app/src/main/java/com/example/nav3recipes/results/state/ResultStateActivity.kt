@@ -85,7 +85,7 @@ class ResultStateActivity : ComponentActivity() {
                                     )
 
                                     Button(onClick = {
-                                        result = state.text as String
+                                        result = state.text.toString()
                                         backStack.removeLastOrNull()
                                     }) {
                                         Text("Return result")

@@ -26,6 +26,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,62 +52,62 @@ class ResultEventActivity : ComponentActivity() {
 
         setContent {
             val resultStore = LocalResultStore.current
+            CompositionLocalProvider(LocalResultStore.provides(resultStore)) {
+                Scaffold { paddingValues ->
 
-            Scaffold { paddingValues ->
+                    val backStack = rememberNavBackStack(Home)
 
-                val backStack = rememberNavBackStack(Home)
-
-                NavDisplay(
-                    backStack = backStack,
-                    modifier = Modifier.padding(paddingValues),
-                    onBack = { backStack.removeLastOrNull() },
-                    entryProvider = { key ->
-                        when (key) {
-                            is Home -> NavEntry(key) {
-                                val viewModel = viewModel<HomeViewModel>(key = Home.toString())
-                                ResultEffect<Name?>(resultStore) { name ->
-                                    viewModel.name = name
-                                }
-
-                                Column {
-                                    Text("Welcome to Nav3")
-                                    Button(onClick = {
-                                        backStack.add(ResultPage())
-                                    }) {
-                                        Text("Click to navigate")
+                    NavDisplay(
+                        backStack = backStack,
+                        modifier = Modifier.padding(paddingValues),
+                        onBack = { backStack.removeLastOrNull() },
+                        entryProvider = { key ->
+                            when (key) {
+                                is Home -> NavEntry(key) {
+                                    val viewModel = viewModel<HomeViewModel>(key = Home.toString())
+                                    ResultEffect<Name?> { name ->
+                                        viewModel.name = name
                                     }
-                                    Text("My returned name is ${viewModel.name}")
-                                }
 
-
-                            }
-                            is ResultPage -> NavEntry(key) {
-                                Column {
-
-                                    val state = rememberTextFieldState()
-                                    OutlinedTextField(
-                                        state = state,
-                                        label = { Text("Result to Return") }
-                                    )
-                                    Button(onClick = {
-                                        resultStore.sendResult<Name>(result = state.text as String)
-                                        backStack.removeLastOrNull()
-                                    }) {
-                                        Text("Return result")
+                                    Column {
+                                        Text("Welcome to Nav3")
+                                        Button(onClick = {
+                                            backStack.add(ResultPage())
+                                        }) {
+                                            Text("Click to navigate")
+                                        }
+                                        Text("My returned name is ${viewModel.name}")
                                     }
                                 }
+
+                                is ResultPage -> NavEntry(key) {
+                                    Column {
+
+                                        val state = rememberTextFieldState()
+                                        OutlinedTextField(
+                                            state = state,
+                                            label = { Text("Result to Return") }
+                                        )
+                                        Button(onClick = {
+                                            resultStore.sendResult<Name>(result = state.text.toString())
+                                            backStack.removeLastOrNull()
+                                        }) {
+                                            Text("Return result")
+                                        }
+                                    }
+                                }
+                                else -> NavEntry(key) { Text("Unknown route") }
                             }
-                            else -> NavEntry(key) { Text("Unknown route") }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }
 }
 
 class HomeViewModel : ViewModel() {
-    var name: String? = null
+    var name by mutableStateOf<String?>(null)
 }
 
 typealias Name = String

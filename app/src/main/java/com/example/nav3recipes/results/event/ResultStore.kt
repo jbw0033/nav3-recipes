@@ -11,10 +11,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 
 
 object LocalResultStore {
-    private val LocalResultStore: ProvidableCompositionLocal<ResultStore?>
-        get() {
-            return compositionLocalOf { null }
-        }
+    private val LocalResultStore: ProvidableCompositionLocal<ResultStore?> =
+        compositionLocalOf { null }
 
     val current: ResultStore
         @Composable
