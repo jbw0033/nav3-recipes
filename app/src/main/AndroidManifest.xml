@@ -66,6 +66,11 @@
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
+            android:name=".bottomsheet.BottomSheetActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Nav3Recipes"/>
+        <activity
+            android:name=".scenes.materiallistdetail.MaterialListDetailActivity"
             android:name=".material.listdetail.MaterialListDetailActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
