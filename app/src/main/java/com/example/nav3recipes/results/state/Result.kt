@@ -6,4 +6,4 @@ import androidx.compose.runtime.remember
 
 @Composable
 fun <T> rememberResult(defaultValue: T) =
-    remember { mutableStateOf(defaultValue) }.apply { value = defaultValue }
+    remember { mutableStateOf(defaultValue) }

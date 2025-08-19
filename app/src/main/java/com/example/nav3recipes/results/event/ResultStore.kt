@@ -4,9 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.compositionLocalOf
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.BUFFERED
+import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
 import kotlinx.coroutines.flow.receiveAsFlow
 
 
@@ -33,7 +32,7 @@ class ResultStore {
 
     inline fun <reified T> sendResult(resultKey: String = T::class.toString(), result: T) {
         if (!channelMap.contains(resultKey)) {
-            channelMap.put(resultKey, Channel(capacity = BUFFERED, onBufferOverflow = BufferOverflow.SUSPEND))
+            channelMap.put(resultKey, Channel(capacity = CONFLATED))
         }
         channelMap[resultKey]?.trySend(result)
     }
