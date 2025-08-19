@@ -33,7 +33,7 @@ Navigation3:
 ```
 // Option 1: entryProvider
 NavDisplay(backStack, ...,
-  entryProvider(fallback) {
+  entryProvider = entryProvider(fallback) {
     entry("profile") { /* content */ }
     entry("friends") { /* content */ }
   }
@@ -44,7 +44,7 @@ NavDisplay(backStack) {
   when(it) {
     "profile" -> NavEntry("profile") { /* content */ }
     "friends" -> NavEntry("friends") { /* content */ }
-    else ->
+    else -> error("Unknown route: $it")
 
   }
 }
@@ -273,7 +273,8 @@ NavDisplay(backStack) {
   when(it) {
     Home -> NavEntry(it) {...}
     SomeActivity -> NavEntry(it) {
-      startActivity(Intent().setClass(context, SomeActivity::class)
+      val context = LocalContext.current
+      context.startActivity(Intent(context, SomeActivity::class.java))
     }
   }
 }
@@ -357,6 +358,7 @@ Navigation3:
 
 // Routes inside nested graph
 @Serializable object Match
+@Serializable object InGame
 
 val mainBackstack = remember { mutableStateListOf<Any>(Title) }
 val gameBackstack = remember { mutableStateListOf<Any>(Match) }
@@ -364,13 +366,13 @@ val gameBackstack = remember { mutableStateListOf<Any>(Match) }
 var backstack = mainBackStack
 
 NavDisplay(backStack, ...,
-  entryProvider() {
+  entryProvider = entryProvider {
     entry(Title) {
       TitleScreen(
         onPlayClicked = { backStack += gameBackStack }
       )
     }
-    entry(Game) { 
+    entry(Match) { 
       MatchScreen(
         onStartGame = { backStack.add(InGame) }
       )
@@ -468,7 +470,7 @@ Navigation3:
 val backStack = remember { mutableStateListOf<Any>(RedBox) }
 SharedTransitionLayout {
   NavDisplay(backStack, ...,
-    entryProvider() {
+    entryProvider = entryProvider {
       entry(RedBox) {
         Box(
           Modifier.sharedBounds(
@@ -542,7 +544,7 @@ NavHost(...) {
   }
 }
 
-navController(NavDeepLinkRequest.fromUrl("deeplink://mydeeplink").build())
+navController.navigate(NavDeepLinkRequest.fromUrl("deeplink://mydeeplink").build())
 ```
 
 Navigation3:
@@ -578,7 +580,7 @@ NavHost(...) {
   }
 }
 
-navController(
+navController.navigate(
   NavDeepLinkRequest.fromAction("action").setMimeType("type").build()
 )
 ```
@@ -610,63 +612,7 @@ override fun onNewIntent(intent: Intent?) {
 
 Navigation3:
 ```
-val intent = Intent()
-intent.data = parseBackStackToUri(backStack)
-
-interface Destination {
-  val deepLink: Uri? = null
-  val parent: Destination? = null
-}
-
-data class Profile(id: String? = null) : Destination {
-  override val deepLink = "https://www.example.com/profile/$id"
-  override val parent = ProfileList
-}
-
-object ProfileList : Destination {
-  override val parent = Root
-}
-
-object Root : Destination
-
-// From another API where you only have the data
-override fun onNewIntent(intent: Intent?) {
-  // super.onNewIntent(intent)
-  val uri = intent.data
-  backStack = changeUriToBackStack(uri)
-}
-
-
-
-fun parseBackStackToUri(backStack: List<Any>): Uri? {
-  return backStack.last().deepLink
-}
-
-fun changeUriToBackStack(uri: URI): List<Any> {
-  // find every instance of Destination
-  val match = destinationList.takeIf {
-    uri == it.deepLink
-  }
-  // find a back stack for the match
-  if (match != null) {
-    val backStack = mutableListOf(match)
-    // Add in a synthetic back stack
-    while (backStack.first().parent != null) {
-      backStack = backStack.first().parent + backStack
-    }
-    return backStack
-  }
-  return listOf()
-}
-
-// You own the intent and pull it out
-val intent = Intent()
-intent.extras = encodeToSavedState(backStack)
-
-override fun onNewIntent(intent: Intent?) {
-  // super.onNewIntent(intent)
-  backStack = decodeFromSavedState(intent.extras!!)
-}
+see deep link recipe
 ```
 
 ## Conditional Navigation
@@ -794,14 +740,14 @@ Navigation 2:
 ```
 @Composable
 fun MyScreen(onNavigate: (Any) -> Unit) {
-  Button(onClick = { onNavigate(Profile) } { /* ... */ }
+  Button(onClick = { onNavigate(Profile) }) { /* ... */ }
 }
 ```
 Navigation3:
 ```
 @Composable
 fun MyScreen(onNavigate: (Any) -> Unit) {
-  Button(onClick = { onNavigate(Profile) } { /* ... */ }
+  Button(onClick = { onNavigate(Profile) }) { /* ... */ }
 }
 ```
 
@@ -881,8 +827,8 @@ Scaffold(
   NavDisplay(
     backStack = backStack,
     onBack = { backStack.removeAt( backStack.size - 1 ) },
-    modifier = Modifier.padding(it)
-    entryProvider {
+    modifier = Modifier.padding(it),
+    entryProvider = entryProvider {
       entry(Profile) { ProfileScreen(...) }
       entry(Friends) { FriendsScreen(...) }
     }
@@ -959,7 +905,10 @@ Scaffold(
         NavigationBarItem(
           selected = topLevelRoute.key == backStack.last(),
           onClick = {
-            backStack.popUntil(Home)
+            val index = backStack.lastIndexOf(Profile)
+            if (index != -1) {
+                backStack.removeRange(index, backStack.size)
+            }
             if (backStack.last() != topLevelRoute.key) {
               backStack.add(topLevelRoute.key)
             }
@@ -978,8 +927,8 @@ Scaffold(
   NavDisplay(
     backStack = backStack,
     onBack = { backStack.removeAt( backStack.size - 1 ) },
-    modifier = Modifier.padding(it)
-    entryProvider {
+    modifier = Modifier.padding(it),
+    entryProvider = entryProvider {
       entry(Profile) { ProfileScreen(...) }
       entry(Friends) { FriendsScreen(...) }
     }
@@ -1008,17 +957,17 @@ Scaffold(
     TopAppBar(
       title = {
         Text(
-         backstack.last { TOP_LEVEL_ROUTES.contains(it) }::class.simpleName
+         backstack.last { key -> TOP_LEVEL_ROUTES.any { it.key == key } }::class.simpleName
         )
       }
     )
   }
 ) {
-  *NavDisplay(
+  NavDisplay(
     backStack = backStack,
     onBack = { backStack.removeAt( backStack.size - 1 ) },
-    modifier = Modifier.padding(it)
-    entryProvider {
+    modifier = Modifier.padding(it),
+    entryProvider = entryProvider {
       entry(Profile) { ProfileScreen(...) }
       entry(Friends) { FriendsScreen(...) }
     }
@@ -1093,8 +1042,8 @@ NavHost(navController, Graph, Profile) {
 
 Navigation3:
 ```
-NavDisplay(backStack, ...,
-  entryProvider() {
+NavDisplay(backStack, ...,,
+  entryProvider = entryProvider { {
     entry(Profile) { AndroidFragment<ProfileFragment>() }
   }
 )
