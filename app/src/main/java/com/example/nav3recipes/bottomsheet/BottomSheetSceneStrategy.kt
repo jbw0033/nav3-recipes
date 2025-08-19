@@ -39,7 +39,7 @@ internal class BottomSheetScene<T : Any>(
  * This strategy should always be added before any non-overlay scene strategies.
  */
 @OptIn(ExperimentalMaterial3Api::class)
-class BottomSheetSceneStrategy<T : Any>() : SceneStrategy<T> {
+class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
 
     @Composable
     override fun calculateScene(
