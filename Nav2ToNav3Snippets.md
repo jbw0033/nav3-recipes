@@ -1,27 +1,27 @@
-# Navigation 2.0 to Navigation3 - Code snippets
+# Navigation Compose (Nav2) to Navigation3 - Code snippets
 
-This document serves as a guide to transitioning Navigation 2 snippets to Navigation 3. It aims to
-provide code examples for the most commonly used Navigation 2 APIs. These examples are meant to serve
-as examples and not the source of truth for how you should implement your code, which should be
-tailored to your specific use case.
+This is a guide for migrating common use cases in Navigation Compose (Nav2) to Navigation3. 
+It provides code examples for common use cases implemented using Nav2 APIs and equivalent 
+code examples for Nav3. These examples are not necessarily the definitive way you should 
+implement your code and should be carefully considered based on your individual requirements. 
 
-These use cases are based on Compose only implementation, not Fragments.
+These use cases are based on Compose, not Fragments.
 
-## Retrieving a NavController
+## Retrieve a NavController
 
-Navigation 2:
+Nav2:
 ```
 val navController = rememberNavController()
 ```
 
-Navigation3:
+Nav3:
 ```
-val backstack = remember { mutableStateListOf<Any>(MyKey) }
+val backStack = remember { mutableStateListOf<Any>(MyKey) }
 ```
 
-## Building Your Graph
+## Build your navigation graph
 
-Navigation 2:
+Nav2:
 ```
 NavHost(navController, "myGraph", "profile") {
   composable("profile") { /* content */ }
@@ -29,9 +29,9 @@ NavHost(navController, "myGraph", "profile") {
 }
 ```
 
-Navigation3:
+Nav3:
 ```
-// Option 1: entryProvider
+// Option 1: Use the entryProvider DSL
 NavDisplay(backStack, ...,
   entryProvider = entryProvider(fallback) {
     entry("profile") { /* content */ }
@@ -39,7 +39,7 @@ NavDisplay(backStack, ...,
   }
 )
 
-// Option 2: When statement
+// Option 2: Use a when statement
 NavDisplay(backStack) {
   when(it) {
     "profile" -> NavEntry("profile") { /* content */ }
@@ -50,40 +50,40 @@ NavDisplay(backStack) {
 }
 ```
 
-## Navigation to a Destination
+## Navigate to a destination
 
-Navigation 2:
+Nav2:
 ```
 navController.navigate(Route)
 ```
 
-Navigation3:
+Nav3:
 ```
-backstack.add(Key)
+backStack.add(Key)
 ```
 
-## Pop Back
+## Navigate back
 
-Navigation 2:
+Nav2:
 ```
 navController.popBackStack()
 ```
 
-Navigation3:
+Nav3:
 ```
 backStack.removeAt(backstack.size - 1)
 ```
 
-## Pop back to a particular destination
+## Navigate back to a particular destination
 
-Navigation 2:
+Nav2:
 ```
 navController.popBackStack(Route2, false)
 
 // if true pop one more
 ```
 
-Navigation3:
+Nav3:
 ```
 val index = backstack.lastIndexOf(Route2)
 if (index != -1) {
@@ -93,7 +93,7 @@ if (index != -1) {
 
 ## Handle a failed pop back
 
-Navigation 2:
+Nav2:
 ```
 if (!navController.popBackStack()) {
     // Call finish() on your Activity
@@ -101,10 +101,11 @@ if (!navController.popBackStack()) {
 }
 ```
 
-Navigation3:
+Nav3:
 ```
+// TODO: Explain this better
 // Not really a case.
-// If you remove all the items from the backstack it will crash
+// If you remove all the items from the back stack `NavDisplay` will crash
 // When there is nothing to pop it will go to the next active callback.
 // To ensure that the activity finishes, you could do the following.
 val handler = BackHandler(true) {
@@ -123,7 +124,7 @@ NavDisplay(backstack) { }
 
 ## Pop up to a destination then navigate
 
-Navigation 2:
+Nav2:
 ```
 navController.navigate(
     route = route,
@@ -133,7 +134,7 @@ navController.navigate(
 )
 ```
 
-Navigation3:
+Nav3:
 ```
 val index = backstack.lastIndexOf("root")
 if (index != -1) {
@@ -144,7 +145,7 @@ backstack.add(route)
 
 ## Save state when popping up
 
-Navigation 2:
+Nav2:
 ```
 navController.navigate(
     route = route,
@@ -155,7 +156,7 @@ navController.navigate(
 )
 ```
 
-Navigation3:
+Nav3:
 ```
 val backStack1 = remember { mutableListOf(Root, Profile) }
 val backStack2 = remember { mutableListOf(Root, Friends) }
@@ -169,31 +170,31 @@ else {
 NavDisplay (backStack, ...)
 ```
 
-## Defining Type Safe Routes
+## Define type safe routes
 
-Navigation 2:
+Nav2:
 ```
 @Serializable
-object Profile
+data object Profile
 
 NavHost(...) {
   composable<Profile>(...) { } 
 }
 ```
 
-Navigation3:
+Nav3:
 ```
 @Serializable
-object Profile
+data object Profile
 
 NavDisplay(..., entryProvider = entryProvider {
   entry<Profile> { }
 })
 ```
 
-## Navigation to Type Safe Routes
+## Reading and writing navigation arguments with type safe routes
 
-Navigation 2:
+Nav2:
 ```
 @Serializable
 data class Profile(id: String = "No Profile")
@@ -206,10 +207,10 @@ NavHost(navController,...) {
   } 
 }
 
-navController.navigate(Profile)
+navController.navigate(Profile("Some Id"))
 ```
 
-Navigation3:
+Nav3:
 ```
 @Serializable
 data class Profile(id: String = "No Profile")
@@ -224,9 +225,9 @@ NavDisplay(backStack,..., entryProvider = entryProvider {
 backStack.add(Profile("Some Id"))
 ```
 
-## Navigating to a Dialog
+## Navigating to a dialog
 
-Navigation 2:
+Nav2:
 ```
 val navController = rememberNavController()
 
@@ -238,13 +239,14 @@ NavHost(navController, startDestination = Home) {
 navController.navigate(Dialog)
 ```
 
-Navigation3:
+Nav3:
 ```
 val backStack = remember { mutableStateListOf<Any>(Home) }
 
 NavDisplay(backStack, sceneStrategy = DialogSceneStrategy<Any>()) {
   when(it) {
-    Home -> NavEntry(it, metadata = DialogSceneStrategy.dialog()) {
+    Home -> { ... }
+    Dialog -> NavEntry(it, metadata = DialogSceneStrategy.dialog()) {
       // content for the dialog
     }
   }
@@ -253,7 +255,7 @@ NavDisplay(backStack, sceneStrategy = DialogSceneStrategy<Any>()) {
 
 ## Navigating to an Activity
 
-Navigation 2:
+Nav2:
 ```
 val navController = rememberNavController()
 
@@ -265,7 +267,7 @@ NavHost(navController, startDestination = Home) {
 navController.navigate(SomeActivity)
 ```
 
-Navigation3:
+Nav3:
 ```
 val backStack = remember { mutableStateListOf<Any>(Home) }
 
@@ -278,14 +280,16 @@ NavDisplay(backStack) {
     }
   }
 }
+
+backStack.add(SomeActivity)
 ```
 
 ## Encapsulation
 
-Navigation 2:
+Nav2:
 ```
 @Serializable
-object Home
+data object Home
 
 fun NavGraphBuilder.homeDestination() {
     composable<Home> { HomeScreen( /* ... */ ) }
@@ -302,12 +306,12 @@ fun MyApp() {
 }
 ```
 
-Navigation3:
+Nav3:
 ```
 @Serializable
 object Home
 
-fun EntryProviderBuilder.homeDestination() {
+fun EntryProviderBuilder<Any>.homeDestination() {
     entry<Home> { HomeScreen( /* ... */ ) }
 }
 
@@ -324,16 +328,16 @@ fun MyApp() {
 
 ## Nested Navigation
 
-Navigation 2:
+Nav2:
 ```
-@Serializable object Title
+@Serializable data object Title
 
 // Route for nested graph
-@Serializable object Game
+@Serializable data object Game
 
 // Routes inside nested graph
-@Serializable object Match
-@Serializable object InGame
+@Serializable data object Match
+@Serializable data object InGame
 
 
 NavHost(navController, startDestination = Title) {
@@ -352,13 +356,13 @@ NavHost(navController, startDestination = Title) {
 }
 ```
 
-Navigation3:
+Nav3:
 ```
-@Serializable object Title
+@Serializable data object Title
 
 // Routes inside nested graph
-@Serializable object Match
-@Serializable object InGame
+@Serializable data object Match
+@Serializable data object InGame
 
 val mainBackstack = remember { mutableStateListOf<Any>(Title) }
 val gameBackstack = remember { mutableStateListOf<Any>(Match) }
@@ -367,12 +371,12 @@ var backstack = mainBackStack
 
 NavDisplay(backStack, ...,
   entryProvider = entryProvider {
-    entry(Title) {
+    entry<Title> {
       TitleScreen(
         onPlayClicked = { backStack += gameBackStack }
       )
     }
-    entry(Match) { 
+    entry<Match> { 
       MatchScreen(
         onStartGame = { backStack.add(InGame) }
       )
@@ -382,9 +386,9 @@ NavDisplay(backStack, ...,
 
 ```
 
-## Animate between destinations
+## Create a custom animation when navigating to and from a specific destination
 
-Navigation 2:
+Nav2:
 ```
 val navController = rememberNavController()
 
@@ -399,7 +403,7 @@ NavHost(navController, startDestination = Home) {
 navController.navigate(Profile)
 ```
 
-Navigation3:
+Nav3:
 ```
 val backStack = rememberMutableBackStackOf<Any>(Home)
 
@@ -416,9 +420,9 @@ NavDisplay(backstack) {
 backStack.add(Profile)
 ```
 
-## Add sharedElements between destinations
+## Add shared elements between destinations
 
-Navigation 2:
+Nav2:
 ```
 SharedTransitionLayout {
   val selectFirst = mutableStateOf(true)
@@ -465,13 +469,13 @@ SharedTransitionLayout {
 }
 ```
 
-Navigation3:
+Nav3:
 ```
 val backStack = remember { mutableStateListOf<Any>(RedBox) }
 SharedTransitionLayout {
   NavDisplay(backStack, ...,
     entryProvider = entryProvider {
-      entry(RedBox) {
+      entry<RedBox> {
         Box(
           Modifier.sharedBounds(
             rememberSharedContentState("name"),
@@ -489,7 +493,7 @@ SharedTransitionLayout {
           Text("start", color = Color.White)
         }
       }
-      entry(BlueBox) {
+      entry<BlueBox> {
         Box(
           Modifier.offset(180.dp, 180.dp)
             .sharedBounds(
@@ -516,7 +520,7 @@ SharedTransitionLayout {
 
 ## Apply pop animations to activity transitions
 
-Navigation 2:
+Nav2:
 ```
 override fun finish() {
     super.finish()
@@ -524,7 +528,7 @@ override fun finish() {
 }
 ```
 
-Navigation3:
+Nav3:
 ```
 override fun finish() {
     super.finish()
@@ -532,9 +536,9 @@ override fun finish() {
 }
 ```
 
-## Deeplinking to a destination
+## Deeplink to a destination
 
-Navigation 2:
+Nav2:
 ```
 NavHost(...) {
   composable(..., 
@@ -547,8 +551,9 @@ NavHost(...) {
 navController.navigate(NavDeepLinkRequest.fromUrl("deeplink://mydeeplink").build())
 ```
 
-Navigation3:
+Nav3:
 ```
+// TODO: This isn't really equivalent functionality
 // Do not deep link internally to destination, just go to them.
 
 val backStack = remember { mutableListOf(MyKey)}
@@ -565,7 +570,7 @@ backStack.add(MyKey2)
 
 ## Navigate with actions and mimetypes
 
-Navigation 2:
+Nav2:
 ```
 NavHost(...) {
   composable(..., 
@@ -584,8 +589,9 @@ navController.navigate(
   NavDeepLinkRequest.fromAction("action").setMimeType("type").build()
 )
 ```
-Navigation3:
+Nav3:
 ```
+// TODO: This isn't really equivalent functionality
 // Do not deep link internally to destination, just go to them.
 
 val backStack = remember { mutableListOf(MyKey)}
@@ -602,7 +608,7 @@ backStack.add(MyKey2)
 
 ## Handling deep link from Intent
 
-Navigation 2:
+Nav2:
 ```
 override fun onNewIntent(intent: Intent?) {
   super.onNewIntent(intent)
@@ -610,14 +616,16 @@ override fun onNewIntent(intent: Intent?) {
 }
 ```
 
-Navigation3:
+Nav3:
 ```
 see deep link recipe
 ```
 
-## Conditional Navigation
+## Conditional navigation
 
-Navigation3:
+// TODO: No Nav2 code and there's already a recipe for this
+
+Nav3:
 ```
 var isLoggedIn by remember { mutableStateOf(false) }
 val backStack = remember { mutableStateListOf<Any>(Home) }
@@ -663,9 +671,12 @@ NavDisplay(
 )
 ```
 
-## Circular Navigation
+## Circular navigation
 
-Navigation 2:
+// TODO: Is it assumed that "a" is already on the stack, that's not immediately clear from the code
+// Also, not entirely clear what "circular" means in this context, is it just avoiding duplicate entries on the stack? 
+
+Nav2:
 ```
 composable("c") {
   DestinationC(
@@ -680,7 +691,7 @@ composable("c") {
 }
 ```
 
-Navigation3:
+Nav3:
 ```
 entry("c") {
   DestinationC(
@@ -698,7 +709,9 @@ entry("c") {
 
 ## Reference a destination using NavBackStackEntry
 
-Navigation 2:
+// TODO: Not sure what this is showing me
+
+Nav2:
 ```
 val entry = navController.getBackStackEntry<Key>()
 
@@ -706,7 +719,7 @@ val lifecycle = entry.lifecycle
 val viewModel = viewModel(entry)
 ```
 
-Navigation3:
+Nav3:
 ```
 // Does not exist in Compose land
 // You would use CompositionLocals to get the proper component
@@ -717,7 +730,9 @@ val viewModel = viewModel(LocalViewModelStoreOwner.current)
 
 ## Share UI-related data with ViewModel
 
-Navigation 2:
+// TODO: Code snippets for Nav2 and Nav3 are identical
+
+Nav2:
 ```
 @Composable
 fun MyScreen(onNavigate: (Any) -> Unit) {
@@ -726,7 +741,7 @@ fun MyScreen(onNavigate: (Any) -> Unit) {
 
 ```
 
-Navigation3:
+Nav3:
 ```
 @Composable
 fun MyScreen(onNavigate: (Any) -> Unit) {
@@ -736,14 +751,16 @@ fun MyScreen(onNavigate: (Any) -> Unit) {
 
 ## Expose events from composable
 
-Navigation 2:
+// TODO: Code snippets for Nav2 and Nav3 are identical
+
+Nav2:
 ```
 @Composable
 fun MyScreen(onNavigate: (Any) -> Unit) {
   Button(onClick = { onNavigate(Profile) }) { /* ... */ }
 }
 ```
-Navigation3:
+Nav3:
 ```
 @Composable
 fun MyScreen(onNavigate: (Any) -> Unit) {
@@ -753,7 +770,9 @@ fun MyScreen(onNavigate: (Any) -> Unit) {
 
 ## Support multiple back stacks
 
-Navigation 2:
+// TODO: This seems to be the Common Navigation UI recipe, remove? 
+
+Nav2:
 ```
 val navController = rememberNavController()
 Scaffold(
@@ -787,7 +806,7 @@ Scaffold(
 }
 ```
 
-Navigation3:
+Nav3:
 ```
 data class TopLevelStack(val stack: MutableList<Any>, val icon: ImageVector)
 
@@ -838,7 +857,9 @@ Scaffold(
 
 ## Integration with the bottom nav bar
 
-Navigation 2:
+// TODO: There's a lot of code here, the main thing to isolate/highlight is the changes to the logic for determining whether the BottomNavigationItem is selected
+
+Nav2:
 ```
 data class TopLevelRoute<T : Any>(val name: String, val route: T, val icon: ImageVector)
 
@@ -887,7 +908,7 @@ Scaffold(
 }
 ```
 
-Navigation3:
+Nav3:
 ```
 data class TopLevelRoute(val key: Any, val icon: ImageVector)
 
@@ -938,12 +959,12 @@ Scaffold(
 
 ## Integration with the top app bar
 
-Navigation 2:
+Nav2:
 ```
 // No guidance for this in Nav 2
 ```
 
-Navigation3:
+Nav3:
 ```
 val TOP_LEVEL_ROUTES = listOf(
     TopLevelRoute(key = Profile, icon = Icons.Profile),
@@ -957,7 +978,7 @@ Scaffold(
     TopAppBar(
       title = {
         Text(
-         backstack.last { key -> TOP_LEVEL_ROUTES.any { it.key == key } }::class.simpleName
+         backStack.last { key -> TOP_LEVEL_ROUTES.any { it.key == key } }::class.simpleName
         )
       }
     )
@@ -977,7 +998,11 @@ Scaffold(
 
 ## Testing
 
-Navigation 2:
+// TODO: This would be better as a separate guide explaining how by separating your back stack from Nav3 (e.g. into a `Navigator` class) you can 
+// move some of your instrumented navigation tests into unit tests that just verify the back stack state after various
+// navigation events (e.g. `NavigatorTest`)
+
+Nav2:
 ```
 class NavigationTest {
 
@@ -1004,7 +1029,7 @@ class NavigationTest {
 }
 ```
 
-Navigation3:
+Nav3:
 ```
 class NavigationTest {
 
@@ -1017,7 +1042,7 @@ class NavigationTest {
   fun setupAppNavHost() {
     composeTestRule.setContent {
       backStack = rememberMutableStateListOf(Start)
-      TestDisplay(backStack = backStack, entryProvider = entryProvider)
+      NavDisplay(backStack = backStack, entryProvider = entryProvider)
     }
   }
 
@@ -1033,17 +1058,17 @@ class NavigationTest {
 
 ## Interoperability
 
-Navigation 2:
+Nav2:
 ```
 NavHost(navController, Graph, Profile) {
   composable(Profile) { AndroidFragment<ProfileFragment>() }
 }
 ```
 
-Navigation3:
+Nav3:
 ```
-NavDisplay(backStack, ...,,
-  entryProvider = entryProvider { {
+NavDisplay(backStack, ...,
+  entryProvider = entryProvider { 
     entry(Profile) { AndroidFragment<ProfileFragment>() }
   }
 )
