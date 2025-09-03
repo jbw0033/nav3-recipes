@@ -1,4 +1,4 @@
-package com.example.nav3recipes.results
+package com.example.nav3recipes.results.event
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,18 +8,18 @@ import androidx.compose.runtime.LaunchedEffect
  *
  * The trailing lambda provides the result from a flow of results.
  *
- * @param resultStore the ResultStore to retrieve the result from
+ * @param resultEventBus the ResultEventBus to retrieve the result from
  * @param resultKey the key that should be associated with this effect
  * @param onResult the callback to invoke when a result is received
  */
 @Composable
 inline fun <reified T> ResultEffect(
-    resultStore: ResultStore = LocalResultStore.current,
+    resultEventBus: ResultEventBus = LocalResultEventBus.current,
     resultKey: String = T::class.toString(),
     crossinline onResult: suspend (T) -> Unit
 ) {
-    LaunchedEffect(resultKey, resultStore.channelMap[resultKey]) {
-        resultStore.getResultFlow<T>()?.collect { result ->
+    LaunchedEffect(resultKey, resultEventBus.channelMap[resultKey]) {
+        resultEventBus.getResultFlow<T>()?.collect { result ->
             onResult.invoke(result as T)
         }
     }

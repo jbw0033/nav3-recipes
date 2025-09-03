@@ -38,17 +38,14 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.example.nav3recipes.results.LocalResultStore
-import com.example.nav3recipes.results.ResultEffect
-import com.example.nav3recipes.results.ResultStore
 import kotlinx.serialization.Serializable
 
 /**
  * This recipe demonstrates passing an event result to a previous screen. It does this by:
  *
- * - Providing a [ResultStore]
+ * - Providing a [ResultEventBus]
  * - Implementing a [ResultEffect] in the receiving screen
- * - Calling [ResultStore.sendResult] from the sending screen.
+ * - Calling [ResultEventBus.sendResult] from the sending screen.
  */
 
 
@@ -64,8 +61,8 @@ class ResultEventActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val resultStore = remember { ResultStore() }
-            CompositionLocalProvider(LocalResultStore.provides(resultStore)) {
+            val resultBus = remember { ResultEventBus() }
+            CompositionLocalProvider(LocalResultEventBus.provides(resultBus)) {
                 Scaffold { paddingValues ->
 
                     val backStack = rememberNavBackStack(Home)
@@ -78,7 +75,7 @@ class ResultEventActivity : ComponentActivity() {
                             when (key) {
                                 is Home -> NavEntry(key) {
                                     val viewModel = viewModel<HomeViewModel>(key = Home.toString())
-                                    ResultEffect<Name?> { name ->
+                                    ResultEffect<Name> { name ->
                                         viewModel.name = name
                                     }
 
@@ -87,9 +84,13 @@ class ResultEventActivity : ComponentActivity() {
                                         Button(onClick = {
                                             backStack.add(ResultPage())
                                         }) {
-                                            Text("Click to navigate")
+                                            Text("Click to provide a name")
                                         }
-                                        Text("My returned name is ${viewModel.name}")
+                                        if (viewModel.name == null) {
+                                            Text("I don't know who you are")
+                                        } else {
+                                            Text("Hi, ${viewModel.name}")
+                                        }
                                     }
                                 }
 
@@ -99,13 +100,13 @@ class ResultEventActivity : ComponentActivity() {
                                         val state = rememberTextFieldState()
                                         OutlinedTextField(
                                             state = state,
-                                            label = { Text("Result to Return") }
+                                            label = { Text("Please enter a name") }
                                         )
                                         Button(onClick = {
-                                            resultStore.sendResult<Name>(result = state.text.toString())
+                                            resultBus.sendResult<Name>(result = state.text.toString())
                                             backStack.removeLastOrNull()
                                         }) {
-                                            Text("Return result")
+                                            Text("Return name")
                                         }
                                     }
                                 }
