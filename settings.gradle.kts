@@ -28,7 +28,7 @@ pluginManagement {
         // Uncomment and change the build ID if you need to use snapshot artifacts.
         // See androidx.dev for full instructions.
         /*maven {
-            url = uri("https://androidx.dev/snapshots/builds/13617490/artifacts/repository")
+            url = uri("https://androidx.dev/snapshots/builds/<build_id>/artifacts/repository")
         }*/
     }
 }
@@ -40,7 +40,7 @@ dependencyResolutionManagement {
         // Uncomment and change the build ID if you need to use snapshot artifacts.
         // See androidx.dev for full instructions.
         /*maven {
-            url = uri("https://androidx.dev/snapshots/builds/13617490/artifacts/repository")
+            url = uri("https://androidx.dev/snapshots/builds/<build_id>/artifacts/repository")
         }*/
     }
 }
