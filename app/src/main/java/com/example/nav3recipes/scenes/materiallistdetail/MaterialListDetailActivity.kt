@@ -68,6 +68,7 @@ class MaterialListDetailActivity : ComponentActivity() {
             val backStack = rememberNavBackStack(ConversationList)
 
             // Override the defaults so that there isn't a horizontal space between the panes.
+            // See b/418201867
             val windowAdaptiveInfo = currentWindowAdaptiveInfo()
             val directive = remember(windowAdaptiveInfo) {
                 calculatePaneScaffoldDirective(windowAdaptiveInfo)
