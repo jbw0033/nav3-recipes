@@ -36,6 +36,7 @@ import com.example.nav3recipes.modular.hilt.ModularActivity
 import com.example.nav3recipes.passingarguments.basicviewmodels.BasicViewModelsActivity
 import com.example.nav3recipes.passingarguments.injectedviewmodels.InjectedViewModelsActivity
 import com.example.nav3recipes.scenes.materiallistdetail.MaterialListDetailActivity
+import com.example.nav3recipes.scenes.materialsupportingpane.MaterialSupportingPaneActivity
 import com.example.nav3recipes.scenes.twopane.TwoPaneActivity
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 
@@ -57,6 +58,7 @@ private val recipes = listOf(
 
     Heading("Layouts and animations"),
     Recipe("Material list-detail layout", MaterialListDetailActivity::class.java),
+    Recipe("Material supporting-pane layout", MaterialSupportingPaneActivity::class.java),
     Recipe("Dialog", DialogActivity::class.java),
     Recipe("Two pane layout (custom scene)", TwoPaneActivity::class.java),
     Recipe("Animations", AnimatedActivity::class.java),
