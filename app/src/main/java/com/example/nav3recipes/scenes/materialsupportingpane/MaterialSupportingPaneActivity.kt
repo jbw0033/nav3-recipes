@@ -48,10 +48,10 @@ import kotlinx.serialization.Serializable
  * the content for these destinations will be shown in a two pane layout.
  */
 @Serializable
-private object Content : NavKey
+private object MainVideo : NavKey
 
 @Serializable
-private data object RelatedContent : NavKey
+private data object RelatedVideos : NavKey
 
 @Serializable
 private data object Profile : NavKey
@@ -65,7 +65,7 @@ class MaterialSupportingPaneActivity : ComponentActivity() {
 
         setContent {
 
-            val backStack = rememberNavBackStack(Content)
+            val backStack = rememberNavBackStack(MainVideo)
 
             // Override the defaults so that there isn't a horizontal or vertical space between the panes.
             // See b/444438086
@@ -87,21 +87,21 @@ class MaterialSupportingPaneActivity : ComponentActivity() {
                 onBack = { numKeysToRemove -> repeat(numKeysToRemove) { backStack.removeLastOrNull() } },
                 sceneStrategy = supportingPaneStrategy,
                 entryProvider = entryProvider {
-                    entry<Content>(
+                    entry<MainVideo>(
                         metadata = SupportingPaneSceneStrategy.mainPane()
                     ) {
-                        ContentRed("Welcome to Nav3") {
+                        ContentRed("Video content") {
                             Button(onClick = {
-                                backStack.add(RelatedContent)
+                                backStack.add(RelatedVideos)
                             }) {
-                                Text("View related content")
+                                Text("View related videos")
                             }
                         }
                     }
-                    entry<RelatedContent>(
+                    entry<RelatedVideos>(
                         metadata = SupportingPaneSceneStrategy.supportingPane()
                     ) {
-                        ContentBlue("Related content") {
+                        ContentBlue("Related videos") {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Button(onClick = {
                                     backStack.add(Profile)
