@@ -11,7 +11,8 @@ These are the recipes and what they demonstrate.
 - **[Entry provider DSL](app/src/main/java/com/example/nav3recipes/basicdsl)**: As above, using the entryProvider DSL.
 
 ### Layouts and animations
-- **[Material adaptive](app/src/main/java/com/example/nav3recipes/scenes/materiallistdetail)**: Shows how to use a Material list-detail layout. 
+- **[Material adaptive List-Detail](app/src/main/java/com/example/nav3recipes/scenes/materiallistdetail)**: Shows how to use a Material list-detail layout. 
+- **[Material adaptive Supporting Pane](app/src/main/java/com/example/nav3recipes/scenes/materialsupportingpane)**: Shows how to use a Material supporting pane layout.
 - **[Dialog](app/src/main/java/com/example/nav3recipes/dialog)**: Shows how to create a Dialog destination.
 - **[Custom Scene](app/src/main/java/com/example/nav3recipes/scenes/twopane)**: Shows how to create a custom layout using a `Scene` and `SceneStrategy` (see video of UI behavior below).
 - **[Animations](app/src/main/java/com/example/nav3recipes/animations)**: Override the default animations for all destinations and a single destination.
