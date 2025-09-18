@@ -43,8 +43,8 @@ import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
 
 /**
- * This example uses the Material ListDetailSceneStrategy to create an adaptive scene. It has three
- * destinations: ConversationList, ConversationDetail and Profile. When the window width allows it,
+ * This example uses the Material SupportingPaneSceneStrategy to create an adaptive scene. It has three
+ * destinations: MainPane, SupportingPane and Profile. When the window width allows it,
  * the content for these destinations will be shown in a two pane layout.
  */
 @Serializable
@@ -75,6 +75,8 @@ class MaterialSupportingPaneActivity : ComponentActivity() {
                     .copy(horizontalPartitionSpacerSize = 0.dp, verticalPartitionSpacerSize = 0.dp)
             }
 
+            // Override the defaults so that the supporting pane can be dismissed by pressing back.
+            // See b/445826749
             val supportingPaneStrategy = rememberSupportingPaneSceneStrategy<NavKey>(
                 backNavigationBehavior = BackNavigationBehavior.PopUntilCurrentDestinationChange,
                 directive = directive
@@ -82,7 +84,7 @@ class MaterialSupportingPaneActivity : ComponentActivity() {
 
             NavDisplay(
                 backStack = backStack,
-                onBack = { keysToRemove -> repeat(keysToRemove) { backStack.removeLastOrNull() } },
+                onBack = { numKeysToRemove -> repeat(numKeysToRemove) { backStack.removeLastOrNull() } },
                 sceneStrategy = supportingPaneStrategy,
                 entryProvider = entryProvider {
                     entry<MainPane>(
