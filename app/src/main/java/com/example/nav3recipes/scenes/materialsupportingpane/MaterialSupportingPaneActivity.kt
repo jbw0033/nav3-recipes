@@ -44,14 +44,14 @@ import kotlinx.serialization.Serializable
 
 /**
  * This example uses the Material SupportingPaneSceneStrategy to create an adaptive scene. It has three
- * destinations: MainPane, SupportingPane and Profile. When the window width allows it,
+ * destinations: Content, RelatedContent and Profile. When the window width allows it,
  * the content for these destinations will be shown in a two pane layout.
  */
 @Serializable
-private object MainPane : NavKey
+private object Content : NavKey
 
 @Serializable
-private data object SupportingPane : NavKey
+private data object RelatedContent : NavKey
 
 @Serializable
 private data object Profile : NavKey
@@ -65,7 +65,7 @@ class MaterialSupportingPaneActivity : ComponentActivity() {
 
         setContent {
 
-            val backStack = rememberNavBackStack(MainPane)
+            val backStack = rememberNavBackStack(Content)
 
             // Override the defaults so that there isn't a horizontal or vertical space between the panes.
             // See b/444438086
@@ -87,21 +87,21 @@ class MaterialSupportingPaneActivity : ComponentActivity() {
                 onBack = { numKeysToRemove -> repeat(numKeysToRemove) { backStack.removeLastOrNull() } },
                 sceneStrategy = supportingPaneStrategy,
                 entryProvider = entryProvider {
-                    entry<MainPane>(
+                    entry<Content>(
                         metadata = SupportingPaneSceneStrategy.mainPane()
                     ) {
                         ContentRed("Welcome to Nav3") {
                             Button(onClick = {
-                                backStack.add(SupportingPane)
+                                backStack.add(RelatedContent)
                             }) {
-                                Text("View Supporting Pane")
+                                Text("View related content")
                             }
                         }
                     }
-                    entry<SupportingPane>(
+                    entry<RelatedContent>(
                         metadata = SupportingPaneSceneStrategy.supportingPane()
                     ) {
-                        ContentBlue("Supporting Pane") {
+                        ContentBlue("Related content") {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Button(onClick = {
                                     backStack.add(Profile)
