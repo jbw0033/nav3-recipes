@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
@@ -73,7 +74,7 @@ class MaterialListDetailActivity : ComponentActivity() {
                 calculatePaneScaffoldDirective(windowAdaptiveInfo)
                     .copy(horizontalPartitionSpacerSize = 0.dp)
             }
-            val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>(directive = directive)
+            val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>(directive = directive) as SceneStrategy<NavKey>
 
             NavDisplay(
                 backStack = backStack,

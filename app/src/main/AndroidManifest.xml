@@ -143,6 +143,10 @@
             android:name=".decorators.newcounter.CounterPerEntryActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
+        <activity
+            android:name=".decorators.toplevelstacks.TopLevelStacksActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Nav3Recipes"/>
 
     </application>
 

@@ -140,12 +140,11 @@ fun <T : Any> counterStateDecorator(counterStates: MutableMap<Any, CounterState>
         onPop = { contentKey ->
             val countState = counterStates[contentKey]
             if (countState?.shouldClearOnPop == true){
-                // Remove the state associated with this entry
                 counterStates.remove(contentKey)
             }
         },
         decorator = { entry ->
-            val countState = counterStates.getOrPut(entry.contentKey) { CounterState() } // Simplified: use getOrPut
+            val countState = counterStates.getOrPut(entry.contentKey) { CounterState() }
             CompositionLocalProvider(LocalCounterState provides countState) {
                 entry.Content()
             }
