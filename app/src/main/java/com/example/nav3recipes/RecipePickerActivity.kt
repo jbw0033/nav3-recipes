@@ -33,8 +33,9 @@ import com.example.nav3recipes.commonui.CommonUiActivity
 import com.example.nav3recipes.conditional.ConditionalActivity
 import com.example.nav3recipes.dialog.DialogActivity
 import com.example.nav3recipes.modular.hilt.ModularActivity
-import com.example.nav3recipes.passingarguments.basicviewmodels.BasicViewModelsActivity
-import com.example.nav3recipes.passingarguments.injectedviewmodels.InjectedViewModelsActivity
+import com.example.nav3recipes.passingarguments.viewmodels.basic.BasicViewModelsActivity
+import com.example.nav3recipes.passingarguments.viewmodels.hilt.HiltViewModelsActivity
+import com.example.nav3recipes.passingarguments.viewmodels.koin.KoinViewModelsActivity
 import com.example.nav3recipes.scenes.materiallistdetail.MaterialListDetailActivity
 import com.example.nav3recipes.scenes.materialsupportingpane.MaterialSupportingPaneActivity
 import com.example.nav3recipes.scenes.twopane.TwoPaneActivity
@@ -70,9 +71,10 @@ private val recipes = listOf(
     Heading("Architecture"),
     Recipe("Modular Navigation", ModularActivity::class.java),
 
-    Heading("Passing navigation arguments"),
-    Recipe("Argument passing to basic ViewModel", BasicViewModelsActivity::class.java),
-    Recipe("Argument passing to injected ViewModel", InjectedViewModelsActivity::class.java),
+    Heading("Passing navigation arguments using ViewModels"),
+    Recipe("Basic", BasicViewModelsActivity::class.java),
+    Recipe("Using Hilt", HiltViewModelsActivity::class.java),
+    Recipe("Using Koin", KoinViewModelsActivity::class.java),
 )
 
 class RecipePickerActivity : ComponentActivity() {

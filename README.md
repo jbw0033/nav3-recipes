@@ -27,6 +27,7 @@ These are the recipes and what they demonstrate.
 ### Passing navigation arguments to ViewModels
 - **[Basic ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/basicviewmodels)**: Navigation arguments are passed to a ViewModel constructed using `viewModel()`
 - **[Hilt injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/injectedviewmodels)**: Navigation arguments are passed to a ViewModel constructed using `hiltViewModel()`
+- **[Koin injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/injectedviewmodels)**: Navigation arguments are passed to a ViewModel constructed using `koinViewModel()`
 
 ### Planned
 - **Deeplinks**: Create and handle deeplinks to specific destinations
