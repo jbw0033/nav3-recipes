@@ -18,7 +18,6 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
-import com.example.nav3recipes.passingarguments.viewmodels.basic.RouteB
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.viewmodel.koinViewModel
@@ -41,13 +40,15 @@ class KoinViewModelsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         // The startKoin block should be placed in Application.onCreate.
-        GlobalContext.startKoin {
-            androidContext(this@KoinViewModelsActivity)
-            modules(
-                module {
-                    viewModelOf(::RouteBViewModel)
-                }
-            )
+        if (GlobalContext.getOrNull() == null) {
+            GlobalContext.startKoin {
+                androidContext(this@KoinViewModelsActivity)
+                modules(
+                    module {
+                        viewModelOf(::RouteBViewModel)
+                    }
+                )
+            }
         }
 
         setEdgeToEdgeConfig()
