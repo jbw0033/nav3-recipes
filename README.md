@@ -25,8 +25,9 @@ These are the recipes and what they demonstrate.
 - **[Modularized navigation code](app/src/main/java/com/example/nav3recipes/modular/hilt)**: Demonstrates how to decouple navigation code into separate modules (uses Dagger/Hilt for DI). 
 
 ### Passing navigation arguments to ViewModels
-- **[Basic ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/basicviewmodels)**: Navigation arguments are passed to a ViewModel constructed using `viewModel()`
-- **[Hilt injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/injectedviewmodels)**: Navigation arguments are passed to a ViewModel constructed using `hiltViewModel()`
+- **[Basic ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/viewmodels/basic)**: Navigation arguments are passed to a ViewModel constructed using `viewModel()`
+- **[Hilt injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/viewmodels/hilt)**: Navigation arguments are passed to a ViewModel constructed using `hiltViewModel()`
+- **[Koin injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/viewmodels/koin)**: Navigation arguments are passed to a ViewModel constructed using `koinViewModel()`
 
 ### Planned
 - **Deeplinks**: Create and handle deeplinks to specific destinations
