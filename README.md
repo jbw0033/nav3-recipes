@@ -16,7 +16,7 @@ These are the recipes and what they demonstrate.
 - **[Animations](app/src/main/java/com/example/nav3recipes/animations)**: Override the default animations for all destinations and a single destination.
 
 ### Material adaptive layouts
-Examples usage of the layouts provided by the [Compose Material3 Adaptive Navigation3
+Examples showing how to use the layouts provided by the [Compose Material3 Adaptive Navigation3
  library](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#compose_material3_adaptive_navigation3_version_10_2)```
 - **[List-Detail](app/src/main/java/com/example/nav3recipes/material/listdetail)**: Shows how to use a Material adaptive list-detail layout.
 - **[Supporting Pane](app/src/main/java/com/example/nav3recipes/material/supportingpane)**: Shows how to use a Material adaptive supporting pane layout.
