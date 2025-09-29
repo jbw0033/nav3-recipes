@@ -1,4 +1,4 @@
-package com.example.nav3recipes.scenes.materialsupportingpane
+package com.example.nav3recipes.material.listdetail
 
 /*
  * Copyright 2025 The Android Open Source Project
@@ -25,9 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
-import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
-import androidx.compose.material3.adaptive.navigation3.SupportingPaneSceneStrategy
-import androidx.compose.material3.adaptive.navigation3.rememberSupportingPaneSceneStrategy
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
@@ -39,24 +38,25 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
 import com.example.nav3recipes.content.ContentRed
+import com.example.nav3recipes.content.ContentYellow
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
 
 /**
- * This example uses the Material SupportingPaneSceneStrategy to create an adaptive scene. It has three
- * destinations: Content, RelatedContent and Profile. When the window width allows it,
+ * This example uses the Material ListDetailSceneStrategy to create an adaptive scene. It has three
+ * destinations: ConversationList, ConversationDetail and Profile. When the window width allows it,
  * the content for these destinations will be shown in a two pane layout.
  */
 @Serializable
-private object MainVideo : NavKey
+private object ConversationList : NavKey
 
 @Serializable
-private data object RelatedVideos : NavKey
+private data class ConversationDetail(val id: String) : NavKey
 
 @Serializable
 private data object Profile : NavKey
 
-class MaterialSupportingPaneActivity : ComponentActivity() {
+class MaterialListDetailActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3AdaptiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,43 +65,41 @@ class MaterialSupportingPaneActivity : ComponentActivity() {
 
         setContent {
 
-            val backStack = rememberNavBackStack(MainVideo)
+            val backStack = rememberNavBackStack(ConversationList)
 
-            // Override the defaults so that there isn't a horizontal or vertical space between the panes.
-            // See b/444438086
+            // Override the defaults so that there isn't a horizontal space between the panes.
+            // See b/418201867
             val windowAdaptiveInfo = currentWindowAdaptiveInfo()
             val directive = remember(windowAdaptiveInfo) {
                 calculatePaneScaffoldDirective(windowAdaptiveInfo)
-                    .copy(horizontalPartitionSpacerSize = 0.dp, verticalPartitionSpacerSize = 0.dp)
+                    .copy(horizontalPartitionSpacerSize = 0.dp)
             }
-
-            // Override the defaults so that the supporting pane can be dismissed by pressing back.
-            // See b/445826749
-            val supportingPaneStrategy = rememberSupportingPaneSceneStrategy<NavKey>(
-                backNavigationBehavior = BackNavigationBehavior.PopUntilCurrentDestinationChange,
-                directive = directive
-            )
+            val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>(directive = directive)
 
             NavDisplay(
                 backStack = backStack,
-                onBack = { numKeysToRemove -> repeat(numKeysToRemove) { backStack.removeLastOrNull() } },
-                sceneStrategy = supportingPaneStrategy,
+                onBack = { keysToRemove -> repeat(keysToRemove) { backStack.removeLastOrNull() } },
+                sceneStrategy = listDetailStrategy,
                 entryProvider = entryProvider {
-                    entry<MainVideo>(
-                        metadata = SupportingPaneSceneStrategy.mainPane()
+                    entry<ConversationList>(
+                        metadata = ListDetailSceneStrategy.listPane(
+                            detailPlaceholder = {
+                                ContentYellow("Choose a conversation from the list")
+                            }
+                        )
                     ) {
-                        ContentRed("Video content") {
+                        ContentRed("Welcome to Nav3") {
                             Button(onClick = {
-                                backStack.add(RelatedVideos)
+                                backStack.add(ConversationDetail("ABC"))
                             }) {
-                                Text("View related videos")
+                                Text("View conversation")
                             }
                         }
                     }
-                    entry<RelatedVideos>(
-                        metadata = SupportingPaneSceneStrategy.supportingPane()
-                    ) {
-                        ContentBlue("Related videos") {
+                    entry<ConversationDetail>(
+                        metadata = ListDetailSceneStrategy.detailPane()
+                    ) { conversation ->
+                        ContentBlue("Conversation ${conversation.id} ") {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Button(onClick = {
                                     backStack.add(Profile)
@@ -112,7 +110,7 @@ class MaterialSupportingPaneActivity : ComponentActivity() {
                         }
                     }
                     entry<Profile>(
-                        metadata = SupportingPaneSceneStrategy.extraPane()
+                        metadata = ListDetailSceneStrategy.extraPane()
                     ) {
                         ContentGreen("Profile")
                     }

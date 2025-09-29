@@ -66,11 +66,11 @@
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
-            android:name=".scenes.materiallistdetail.MaterialListDetailActivity"
+            android:name=".material.listdetail.MaterialListDetailActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
-            android:name=".scenes.materialsupportingpane.MaterialSupportingPaneActivity"
+            android:name=".material.supportingpane.MaterialSupportingPaneActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
