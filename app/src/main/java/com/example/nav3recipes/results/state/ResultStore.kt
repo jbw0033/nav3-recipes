@@ -6,6 +6,8 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 
 /**
  * Local for storing results in a [ResultStore]
@@ -28,6 +30,16 @@ object LocalResultStore {
         store: ResultStore
     ): ProvidedValue<ResultStore?> {
         return LocalResultStore.provides(store)
+    }
+}
+
+/**
+ * Provides a [ResultStore] that will be remembered across configuration changes.
+ */
+@Composable
+fun rememberResultStore() : ResultStore {
+    return rememberSaveable(saver = ResultStoreSaver()) {
+        ResultStore()
     }
 }
 
@@ -63,3 +75,10 @@ class ResultStore {
         resultStateMap.remove(resultKey)
     }
 }
+
+/** Saver to save and restore the NavController across config change and process death. */
+private fun ResultStoreSaver(): Saver<ResultStore, *> =
+    Saver(
+        save = { it.resultStateMap },
+        restore = { ResultStore().apply { resultStateMap.putAll(it)  } },
+    )

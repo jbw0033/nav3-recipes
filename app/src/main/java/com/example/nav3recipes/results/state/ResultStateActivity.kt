@@ -27,7 +27,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -55,7 +54,7 @@ class ResultStateActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val resultStore = remember { ResultStore() }
+            val resultStore = rememberResultStore()
             CompositionLocalProvider(LocalResultStore.provides(resultStore)) {
             Scaffold { paddingValues ->
                 val backStack = rememberNavBackStack(Home)
