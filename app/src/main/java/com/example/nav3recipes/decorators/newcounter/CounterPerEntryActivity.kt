@@ -39,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavEntryDecorator
-import androidx.navigation3.runtime.navEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.content.ContentRed
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
@@ -136,14 +135,14 @@ class CounterPerEntryActivity : ComponentActivity() {
 
 @Composable
 fun <T : Any> counterStateDecorator(counterStates: MutableMap<Any, CounterState>): NavEntryDecorator<T> =
-    navEntryDecorator(
+    NavEntryDecorator(
         onPop = { contentKey ->
             val countState = counterStates[contentKey]
             if (countState?.shouldClearOnPop == true){
                 counterStates.remove(contentKey)
             }
         },
-        decorator = { entry ->
+        decorate = { entry ->
             val countState = counterStates.getOrPut(entry.contentKey) { CounterState() }
             CompositionLocalProvider(LocalCounterState provides countState) {
                 entry.Content()

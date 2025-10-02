@@ -35,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavEntryDecorator
-import androidx.navigation3.runtime.navEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.content.ContentRed
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
@@ -104,7 +103,7 @@ class RenderCountActivity : ComponentActivity() {
 }
 
 fun <T : Any> myDecorator(count: MutableState<Int>) =
-    navEntryDecorator<T>(onPop = { count.value-- }) { entry ->
+    NavEntryDecorator<T>(onPop = { count.value-- }) { entry ->
         LaunchedEffect(entry.contentKey) { count.value++ }
         CompositionLocalProvider(LocalCount provides count.value) {
             entry.Content()

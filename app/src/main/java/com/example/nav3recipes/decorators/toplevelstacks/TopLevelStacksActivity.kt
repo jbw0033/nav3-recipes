@@ -37,13 +37,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
@@ -94,7 +93,7 @@ class TopLevelStacksActivity : ComponentActivity() {
 
             val navigator = rememberNavigator(startRoute = RouteA, canTopLevelRoutesExistTogether = true, shouldPrintDebugInfo = true)
 
-            val entryProvider = entryProvider {
+            val entryProvider = entryProvider<Route> {
                 featureASection(
                     onSubRouteClick = { navigator.navigate(RouteA1) },
                     onDialogClick = { navigator.navigate(RouteD) },
@@ -118,7 +117,6 @@ class TopLevelStacksActivity : ComponentActivity() {
             }
 
             val decorators = listOf<NavEntryDecorator<Route>>(
-                rememberSceneSetupNavEntryDecorator(),
                 rememberSavedStateNavEntryDecorator()
             )
 
@@ -161,7 +159,7 @@ class TopLevelStacksActivity : ComponentActivity() {
     }
 }
 
-private fun EntryProviderBuilder<Route>.featureASection(
+private fun EntryProviderScope<Route>.featureASection(
     onSubRouteClick: () -> Unit,
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit,
@@ -185,7 +183,7 @@ private fun EntryProviderBuilder<Route>.featureASection(
     entry<RouteE> { ContentBlue("Route E title") }
 }
 
-private fun EntryProviderBuilder<Route>.featureBSection(
+private fun EntryProviderScope<Route>.featureBSection(
     onDetailClick: (id: String) -> Unit,
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit
@@ -210,7 +208,7 @@ private fun EntryProviderBuilder<Route>.featureBSection(
     }
 }
 
-private fun EntryProviderBuilder<Route>.featureCSection(
+private fun EntryProviderScope<Route>.featureCSection(
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit,
 ) {
