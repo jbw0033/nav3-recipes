@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -34,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -105,8 +107,9 @@ class Step5MigrationActivity : ComponentActivity() {
         setEdgeToEdgeConfig()
         super.onCreate(savedInstanceState)
         setContent {
+            val coroutineScope = rememberCoroutineScope()
             val navController = rememberNavController()
-            val navigator = remember { Navigator(navController, shouldPrintDebugInfo = true) }
+            val navigator = remember { Navigator(coroutineScope, navController, shouldPrintDebugInfo = true) }
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
             Scaffold(bottomBar = {
@@ -134,48 +137,48 @@ class Step5MigrationActivity : ComponentActivity() {
             })
 
             { paddingValues ->
-                NavDisplay(
-                    backStack = navigator.backStack,
-                    onBack = { navigator.goBack() },
-                    entryProvider = entryProvider(
-                        fallback = { key ->
-                            NavEntry(key = key) {
-                                NavHost(
-                                    navController = navController,
-                                    startDestination = BaseRouteA,
-                                    modifier = Modifier.padding(paddingValues)
-                                ) {
-                                    featureASection(
-                                        onSubRouteClick = { navController.navigate(RouteA1) },
-                                        onDialogClick = { navController.navigate(RouteD) },
-                                        onOtherClick = { navController.navigate(RouteE) }
-                                    )
-                                    navigation<BaseRouteB>(startDestination = RouteB) {
-                                        composable<RouteB> {}
-                                        composable<RouteB1> {}
-                                        composable<RouteE> {}
-                                    }
-                                    featureCSection(
-                                        onDialogClick = { navController.navigate(RouteD) },
-                                        onOtherClick = { navController.navigate(RouteE) }
-                                    )
-                                    dialog<RouteD> { key ->
-                                        Text(
-                                            modifier = Modifier.background(Color.White),
-                                            text = "Route D title (dialog)"
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                Box(modifier = Modifier.padding(paddingValues)) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = BaseRouteA
                     ) {
-                        featureBSection(
-                            onDetailClick = { id -> navigator.navigate(RouteB1(id)) },
-                            onDialogClick = { navigator.navigate(RouteD) },
-                            onOtherClick = { navigator.navigate(RouteE) }
+                        featureASection(
+                            onSubRouteClick = { navController.navigate(RouteA1) },
+                            onDialogClick = { navController.navigate(RouteD) },
+                            onOtherClick = { navController.navigate(RouteE) }
                         )
+                        navigation<BaseRouteB>(startDestination = RouteB) {
+                            composable<RouteB> {}
+                            composable<RouteB1> {}
+                            composable<RouteE> {}
+                        }
+                        featureCSection(
+                            onDialogClick = { navController.navigate(RouteD) },
+                            onOtherClick = { navController.navigate(RouteE) }
+                        )
+                        dialog<RouteD> { key ->
+                            Text(
+                                modifier = Modifier.background(Color.White),
+                                text = "Route D title (dialog)"
+                            )
+                        }
                     }
-                )
+                    NavDisplay(
+                        backStack = navigator.backStack,
+                        onBack = { navigator.goBack() },
+                        entryProvider = entryProvider(
+                            fallback = { key ->
+                                NavEntry(key = key) {}
+                            }
+                        ) {
+                            featureBSection(
+                                onDetailClick = { id -> navigator.navigate(RouteB1(id)) },
+                                onDialogClick = { navigator.navigate(RouteD) },
+                                onOtherClick = { navigator.navigate(RouteE) }
+                            )
+                        }
+                    )
+                }
             }
         }
     }

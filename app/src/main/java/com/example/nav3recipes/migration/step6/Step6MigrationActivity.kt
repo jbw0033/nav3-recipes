@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -34,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,7 +43,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -106,8 +107,9 @@ class Step6MigrationActivity : ComponentActivity() {
         setEdgeToEdgeConfig()
         super.onCreate(savedInstanceState)
         setContent {
+            val coroutineScope = rememberCoroutineScope()
             val navController = rememberNavController()
-            val navigator = remember { Navigator(navController) }
+            val navigator = remember { Navigator(coroutineScope, navController) }
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
             Scaffold(bottomBar = {
@@ -135,59 +137,64 @@ class Step6MigrationActivity : ComponentActivity() {
             })
 
             { paddingValues ->
-                NavDisplay(
-                    backStack = navigator.backStack,
-                    onBack = { navigator.goBack() },
-                    sceneStrategy = remember { DialogSceneStrategy() },
-                    entryProvider = entryProvider(
-                        fallback = { key ->
-                            NavEntry(key = key) {
-                                NavHost(
-                                    navController = navController,
-                                    startDestination = BaseRouteA,
-                                    modifier = Modifier.padding(paddingValues)
-                                ) {
-                                    navigation<BaseRouteA>(startDestination = RouteA) {
-                                        composable<RouteA> {}
-                                        composable<RouteA1> {}
-                                        composable<RouteE> {}
-                                    }
-                                    navigation<BaseRouteB>(startDestination = RouteB) {
-                                        composable<RouteB> {}
-                                        composable<RouteB1> {}
-                                        composable<RouteE> {}
-                                    }
-                                    navigation<BaseRouteC>(startDestination = RouteC) {
-                                        composable<RouteC> {}
-                                        composable<RouteE> {}
-                                    }
-                                    dialog<RouteD> {}
-                                }
+                Box(modifier = Modifier.padding(paddingValues)) {
+                    // Base Layer: Legacy NavHost is always in the composition tree.
+                    NavHost(
+                        navController = navController,
+                        startDestination = BaseRouteA
+                    ) {
+                        // All routes are now rendered by NavDisplay, so these are all empty.
+                        navigation<BaseRouteA>(startDestination = RouteA) {
+                            composable<RouteA> {}
+                            composable<RouteA1> {}
+                            composable<RouteE> {}
+                        }
+                        navigation<BaseRouteB>(startDestination = RouteB) {
+                            composable<RouteB> {}
+                            composable<RouteB1> {}
+                            composable<RouteE> {}
+                        }
+                        navigation<BaseRouteC>(startDestination = RouteC) {
+                            composable<RouteC> {}
+                            composable<RouteE> {}
+                        }
+                        dialog<RouteD> {}
+                    }
+
+                    // Overlay Layer: NavDisplay for all screens.
+                    NavDisplay(
+                        backStack = navigator.backStack,
+                        onBack = { navigator.goBack() },
+                        sceneStrategy = remember { DialogSceneStrategy() },
+                        entryProvider = entryProvider(
+                            fallback = { key ->
+                                // Should ideally not be called if all routes are migrated.
+                                NavEntry(key = key) {}
+                            }
+                        ) {
+                            featureASection(
+                                onSubRouteClick = { navigator.navigate(RouteA1) },
+                                onDialogClick = { navigator.navigate(RouteD) },
+                                onOtherClick = { navigator.navigate(RouteE) }
+                            )
+                            featureBSection(
+                                onDetailClick = { id -> navigator.navigate(RouteB1(id)) },
+                                onDialogClick = { navigator.navigate(RouteD) },
+                                onOtherClick = { navigator.navigate(RouteE) }
+                            )
+                            featureCSection(
+                                onDialogClick = { navigator.navigate(RouteD) },
+                                onOtherClick = { navigator.navigate(RouteE) }
+                            )
+                            entry<RouteD>(metadata = DialogSceneStrategy.dialog()) {
+                                Text(
+                                    modifier = Modifier.background(Color.White),
+                                    text = "Route D title (dialog)"
+                                )
                             }
                         }
-                    ) {
-                        featureASection(
-                            onSubRouteClick = { navigator.navigate(RouteA1) },
-                            onDialogClick = { navigator.navigate(RouteD) },
-                            onOtherClick = { navigator.navigate(RouteE) }
-                        )
-                        featureBSection(
-                            onDetailClick = { id -> navigator.navigate(RouteB1(id)) },
-                            onDialogClick = { navigator.navigate(RouteD) },
-                            onOtherClick = { navigator.navigate(RouteE) }
-                        )
-                        featureCSection(
-                            onDialogClick = { navigator.navigate(RouteD) },
-                            onOtherClick = { navigator.navigate(RouteE) }
-                        )
-                        entry<RouteD>(metadata = DialogSceneStrategy.dialog()) {
-                            Text(
-                                modifier = Modifier.background(Color.White),
-                                text = "Route D title (dialog)"
-                            )
-                        }
-                    }
-                )
+                    )
+                }
             }
         }
     }

@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -34,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -66,24 +68,31 @@ import kotlin.reflect.KClass
 
 @Serializable
 data object BaseRouteA
+
 @Serializable
 data object RouteA
+
 @Serializable
 data object RouteA1
 
 @Serializable
 data object BaseRouteB
+
 @Serializable
 data object RouteB : Route.TopLevel
+
 @Serializable
 data class RouteB1(val id: String)
 
 @Serializable
 data object BaseRouteC
+
 @Serializable
 data object RouteC
+
 @Serializable
 data object RouteD
+
 @Serializable
 data object RouteE
 
@@ -101,12 +110,16 @@ data class NavBarItem(
 
 class Step4MigrationActivity : ComponentActivity() {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setEdgeToEdgeConfig()
         super.onCreate(savedInstanceState)
+
         setContent {
+            val coroutineScope = rememberCoroutineScope()
             val navController = rememberNavController()
-            val navigator = remember { Navigator(navController, shouldPrintDebugInfo = true) }
+            val navigator =
+                remember { Navigator(coroutineScope, navController, shouldPrintDebugInfo = true) }
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
             Scaffold(bottomBar = {
@@ -134,48 +147,48 @@ class Step4MigrationActivity : ComponentActivity() {
             })
 
             { paddingValues ->
-                NavDisplay(
-                    backStack = navigator.backStack,
-                    onBack = { navigator.goBack() },
-                    entryProvider = entryProvider(
-                        fallback = { key ->
-                            NavEntry(key = key) {
-                                NavHost(
-                                    navController = navController,
-                                    startDestination = BaseRouteA,
-                                    modifier = Modifier.padding(paddingValues)
-                                ) {
-                                    featureASection(
-                                        onSubRouteClick = { navController.navigate(RouteA1) },
-                                        onDialogClick = { navController.navigate(RouteD) },
-                                        onOtherClick = { navController.navigate(RouteE) }
-                                    )
-                                    navigation<BaseRouteB>(startDestination = RouteB) {
-                                        composable<RouteB> {}
-                                        composable<RouteB1> {}
-                                        composable<RouteE> {}
-                                    }
-                                    featureCSection(
-                                        onDialogClick = { navController.navigate(RouteD) },
-                                        onOtherClick = { navController.navigate(RouteE) }
-                                    )
-                                    dialog<RouteD> { key ->
-                                        Text(
-                                            modifier = Modifier.background(Color.White),
-                                            text = "Route D title (dialog)"
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                Box(modifier = Modifier.padding(paddingValues)) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = BaseRouteA
                     ) {
-                        featureBSection(
-                            onDetailClick = { id -> navController.navigate(RouteB1(id)) },
+                        featureASection(
+                            onSubRouteClick = { navController.navigate(RouteA1) },
                             onDialogClick = { navController.navigate(RouteD) },
                             onOtherClick = { navController.navigate(RouteE) }
                         )
+                        navigation<BaseRouteB>(startDestination = RouteB) {
+                            composable<RouteB> {}
+                            composable<RouteB1> {}
+                            composable<RouteE> {}
+                        }
+                        featureCSection(
+                            onDialogClick = { navController.navigate(RouteD) },
+                            onOtherClick = { navController.navigate(RouteE) }
+                        )
+                        dialog<RouteD> { key ->
+                            Text(
+                                modifier = Modifier.background(Color.White),
+                                text = "Route D title (dialog)"
+                            )
+                        }
                     }
-                )
+                    NavDisplay(
+                        backStack = navigator.backStack,
+                        onBack = { navigator.goBack() },
+                        entryProvider = entryProvider(
+                            fallback = { key ->
+                                NavEntry(key = key) {}
+                            }
+                        ) {
+                            featureBSection(
+                                onDetailClick = { id -> navController.navigate(RouteB1(id)) },
+                                onDialogClick = { navController.navigate(RouteD) },
+                                onOtherClick = { navController.navigate(RouteE) }
+                            )
+                        }
+                    )
+                }
             }
         }
     }
@@ -212,26 +225,26 @@ private fun EntryProviderBuilder<Any>.featureBSection(
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit
 ) {
-        entry<RouteB> {
-            ContentGreen("Route B title") {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Button(onClick = { onDetailClick("ABC") }) {
-                        Text("Go to B1")
-                    }
-                    Button(onClick = onDialogClick) {
-                        Text("Open dialog D")
-                    }
-                    Button(onClick = onOtherClick) {
-                        Text("Go to E")
-                    }
+    entry<RouteB> {
+        ContentGreen("Route B title") {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Button(onClick = { onDetailClick("ABC") }) {
+                    Text("Go to B1")
+                }
+                Button(onClick = onDialogClick) {
+                    Text("Open dialog D")
+                }
+                Button(onClick = onOtherClick) {
+                    Text("Go to E")
                 }
             }
         }
-        entry<RouteB1> { key ->
-            ContentPurple("Route B1 title. ID: ${key.id}")
-        }
-        entry<RouteE> { ContentBlue("Route E title") }
     }
+    entry<RouteB1> { key ->
+        ContentPurple("Route B1 title. ID: ${key.id}")
+    }
+    entry<RouteE> { ContentBlue("Route E title") }
+}
 
 private fun NavGraphBuilder.featureCSection(
     onDialogClick: () -> Unit,

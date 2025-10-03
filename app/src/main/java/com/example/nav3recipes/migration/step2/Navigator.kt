@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
  */
 @SuppressLint("RestrictedApi")
 class Navigator(
+    coroutineScope: CoroutineScope,
     private val navController: NavHostController,
     private val startRoute: Any = Unit,
     private val canTopLevelRoutesExistTogether: Boolean = false,
@@ -37,7 +38,7 @@ class Navigator(
     // Maintain a map of shared routes to their parent stacks
     private var sharedRoutes: MutableMap<Any, Any> = mutableMapOf()
 
-    val coroutineScope = CoroutineScope(Job())
+    //val coroutineScope = CoroutineScope(Job())
 
     init {
         inititalizeTopLevelStacks()

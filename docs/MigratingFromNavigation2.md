@@ -116,31 +116,35 @@ val navigator = remember { Navigator(navController) }
 - Do a project-wide search for "NavController" and "NavHostController"
 - Update any classes or methods that accept a `NavController` or `NavHostController` to also accept `Navigator` as a parameter
 
-### 2.3 Wrap NavHost with NavDisplay 
+### 2.3 Add a `NavDisplay` on top of `NavHost` 
 
-Goal: `NavDisplay` displays your existing `NavHost` using a fallback `NavEntry`.
+Goal: `NavDisplay` is displayed transparently on top of your existing `NavHost`
 
-- Wrap `NavHost` with a `NavDisplay`
+The idea here is to let `NavHost` render all the legacy routes and `NavDisplay` render migrated routes. When `NavDisplay` encounters a legacy route it will render nothing, allowing the original `NavHost` to render the route instead.
+
+- Wrap your existing `NavHost` with a `Box`
+- Add a `NavDisplay` inside the `Box` under the `NavHost`
 - Pass your `Navigator`'s back stack to the `NavDisplay`
 - Set `NavDisplay.onBack` to call `navigator.goBack()`
-- Create an `entryProvider` with a `fallback` lambda that always displays the existing `NavHost`
+- Create an `entryProvider` with a `fallback` lambda that has no composable content causing the existing `NavHost` to be displayed
 
 Example:
 
 ```
-NavDisplay(
-   backStack = navigator.backStack,
-   onBack = { navigator.goBack() },
-   entryProvider = entryProvider(
-       fallback = { key ->
-           NavEntry(key = key) {
-               NavHost(...)
-           }
-       },
-   ) {
-       // No Nav3 entries yet
-   },
-)
+Box {
+    NavHost(...)
+    NavDisplay(
+        backStack = navigator.backStack,
+        onBack = { navigator.goBack() },
+        entryProvider = entryProvider(
+            fallback = { key ->
+                NavEntry(key = key) {}
+            }
+        ) {
+            // No nav entries added yet.
+        }
+    )
+}
 ```
 
 ## Step 3. [Single feature] Migrate routes 
@@ -317,7 +321,7 @@ Steps:
 
 ## Step 4. [Single feature] Move destinations from NavHost to entryProvider 
 
-Goal: When navigating to a route, it is provided using `NavDisplay's entryProvider`.
+Goal: When navigating to a migrated route, it is provided using `NavDisplay's entryProvider`.
 
 ### 4.1 Move composable content from NavHost into entryProvider 
 
