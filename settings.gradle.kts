@@ -25,11 +25,9 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        // Uncomment and change the build ID if you need to use snapshot artifacts.
-        // See androidx.dev for full instructions.
-        /*maven {
-            url = uri("https://androidx.dev/snapshots/builds/<build_id>/artifacts/repository")
-        }*/
+        maven {
+            url = uri("https://androidx.dev/snapshots/builds/13636250/artifacts/repository")
+        }
     }
 }
 dependencyResolutionManagement {
@@ -37,11 +35,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        // Uncomment and change the build ID if you need to use snapshot artifacts.
-        // See androidx.dev for full instructions.
-        /*maven {
-            url = uri("https://androidx.dev/snapshots/builds/<build_id>/artifacts/repository")
-        }*/
+        maven {
+            url = uri("https://androidx.dev/snapshots/builds/13636250/artifacts/repository")
+        }
     }
 }
 

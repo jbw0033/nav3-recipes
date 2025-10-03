@@ -162,8 +162,8 @@ class TwoPaneActivity : ComponentActivity() {
         val productRoute =
             Product(productId)
         // Avoid adding the same product route to the back stack twice.
-        if (!contains(productRoute)) {
+        //if (!contains(productRoute)) {
             add(productRoute)
-        }
+        //}
     }
 }
