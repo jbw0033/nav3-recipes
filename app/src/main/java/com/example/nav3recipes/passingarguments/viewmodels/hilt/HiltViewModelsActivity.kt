@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.nav3recipes.passingarguments.injectedviewmodels
+package com.example.nav3recipes.passingarguments.viewmodels.hilt
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -25,17 +25,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
+import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
-import com.example.nav3recipes.passingarguments.basicviewmodels.RouteB
+import com.example.nav3recipes.passingarguments.viewmodels.basic.RouteB
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -54,7 +53,7 @@ data object RouteA
 data class RouteB(val id: String)
 
 @AndroidEntryPoint
-class InjectedViewModelsActivity : ComponentActivity() {
+class HiltViewModelsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setEdgeToEdgeConfig()
