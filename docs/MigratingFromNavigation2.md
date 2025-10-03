@@ -68,8 +68,8 @@ androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", vers
 
 ### 1.1 Create a common navigation module 
 
-- If you don't have one already, create a :`core:navigation` module
-- Add the Nav3 runtime as a dependency using `api(libs.androidx.navigation3.runtime). This` allows modules depending on :core:navigation `to` use the Nav3 runtime API.
+- If you don't have one already, create a `:core:navigation` module
+- Add the Nav3 runtime as a dependency using `api(libs.androidx.navigation3.runtime)`. This allows modules depending on `:core:navigation` to use the Nav3 runtime API.
 - Add the Nav2 dependencies. These will be removed once migration is complete.
 
 Example `build.gradle.kts`:
@@ -81,11 +81,11 @@ dependencies {
 }
 ```
 
-**Note**: Nav3 has two libraries: `runtime` and `ui`. Usually only the `app` module needs to depend on `navigation3.ui` which is why it isn't included in the :`core:navigation` dependencies above.
+**Note**: Nav3 has two libraries: `runtime` and `ui`. Usually only the `app` module needs to depend on `navigation3.ui` which is why it isn't included in the `:core:navigation` dependencies above.
 
 ### 1.2 Update main app module 
 
-- Update the `app` module to depend on :`core:navigation` and on `androidx.navigation3.ui`
+- Update the `app` module to depend on `:core:navigation` and on `androidx.navigation3.ui`
 - Update compileSdk to 36 or above
 - Update minSdk to 23 or above
 - Update AGP to 8.9.3 or above
@@ -96,9 +96,9 @@ dependencies {
 
 Important: A fundamental difference between Nav2 and Nav3 is that **you own the back stack**. This means much of the logic and state that was previously managed by Nav2, must now be managed by you. This gives you greater flexibility and control, but also more responsibility.
 
-To aid with migration, a class which provides and manages a back stack named `Navigator` is provided for you. It is not part of the Nav3 library and it does not provide all the features of Nav2. Instead it is intended to be an assistant during migration, and after to be a starting point for you to implement your own navigation behavior and logic.
+To aid with migration, a class which provides and manages a back stack named `Navigator` is provided for you. It is not part of the Nav3 library and it does not provide all the features of Nav2. Instead, it is intended to be an assistant during migration, and after to be a starting point for you to implement your own navigation behavior and logic.
 
-Copy the [`Navigator`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt) to the :`core:navigation` module. This class contains `backStack: SnapshotStateList<Any>` that can be used with `NavDisplay.It` will mirror `NavController`'s back stack ensuring that Nav2's state remains the source of truth throughout migration. After the migration is complete, the NavController mirroring code will be removed.
+Copy the [`Navigator`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt) to the `:core:navigation` module. This class contains `backStack: SnapshotStateList<Any>` that can be used with `NavDisplay`. It will mirror `NavController`'s back stack ensuring that Nav2's state remains the source of truth throughout migration. After the migration is complete, the NavController mirroring code will be removed.
 
 ### 2.2 Make the Navigator available everywhere that NavController is 
 
@@ -149,7 +149,7 @@ Box {
 
 ## Step 3. [Single feature] Migrate routes 
 
-Goal: Routes are moved into their own :`feature:api` module and their properties are modelled outside of `NavHost`
+Goal: Routes are moved into their own `:feature:api` module and their properties are modelled outside of `NavHost`
 
 ### 3.1 Split feature module into api and impl 
 
@@ -157,24 +157,24 @@ Choose **a single feature module** that does not contain the start destination f
 
 Create the `api` module:
 
-- Create a new feature module named :`<existingfeaturename>:api`
+- Create a new feature module named `:<existingfeaturename>:api`
 - Move the routes into it
 - Apply the KotlinX Serialization plugin to the module by updating the `build.gradle.kts`
 
-Update the :`core:navigation` module:
+Update the `:core:navigation` module:
 
-- Add a dependency on :`<existingfeaturename>:api` - this allows `Navigator` to access the feature's routes. It is not good practice for :`core` modules to depend on :`feature` modules, however, this is necessary during migration. This dependency will be removed once migration is complete.
+- Add a dependency on `:<existingfeaturename>:api` - this allows `Navigator` to access the feature's routes. It is not good practice for `:core` modules to depend on `:feature` modules, however, this is necessary during migration. This dependency will be removed once migration is complete.
 
 Create the `impl` module:
 
-- Move the remaining contents of :`<existingfeaturename>` into :`<existingfeaturename>:impl`
+- Move the remaining contents of `:<existingfeaturename>` into `:<existingfeaturename>:impl`
 - Add the following dependencies:
-    - :`<existingfeaturename>:api` so it has access to the routes
-    - :`core:navigation` so it has access to the Nav3 APIs and the `Navigator` class
+    - `:<existingfeaturename>:api` so it has access to the routes
+    - `:core:navigation` so it has access to the Nav3 APIs and the `Navigator` class
 
-Update :`app` dependencies:
+Update `:app` dependencies:
 
-- Update the :`app` module to depend on both :`<existingfeaturename>:api` and :`<existingfeaturename>:impl`.
+- Update the `:app` module to depend on both `:<existingfeaturename>:api` and `:<existingfeaturename>:impl`.
 
 ### 3.2 Model nested navigation graphs 
 
@@ -182,7 +182,7 @@ Skip this section if you don't use nested navigation graphs.
 
 #### 3.2.1 Nested graph migration overview
 
-In Nav2, you can define nested navigation graphs using the `navigation` builder function inside `NavHost. NavController` provides a back stack for each nested graph. This allows you to have several top level destinations, each with sub-destinations. You can also define shared destinations - ones that are accessible from more than one navigation graph - by duplicating the destination in multiple graphs.
+In Nav2, you can define nested navigation graphs using the `navigation` builder function inside `NavHost`. `NavController` provides a back stack for each nested graph. This allows you to have several top level destinations, each with sub-destinations. You can also define shared destinations - ones that are accessible from more than one navigation graph - by duplicating the destination in multiple graphs.
 
 For example, the following code defines two nested navigation graphs, each containing a shared destination defined by `RouteE`.
 
@@ -309,7 +309,7 @@ Taking the code example from above. The starting route is A.
 
 Review the provided `Navigator` class to ensure that it can model your app's current navigation behavior. In particular:
 
-- Review the [`add`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt#L142)
+- Review the [`add method`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt#L142)
 - Note that `popUpTo` in the [`navigate`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step7/Navigator.kt#L121) will be ignored when switching to Nav3 in the final step. There is no equivalent to `popUpTo` in Nav3 because you control the back stack. The supplied `Navigator` class does, however, include logic to pop all top level stacks up to the starting stack when navigating to a new top level route. This behavior can be toggled using `canTopLevelRoutesExistTogether`.
 
 #### 3.2.2 Update routes to implement marker interfaces
@@ -321,7 +321,7 @@ Steps:
 
 ## Step 4. [Single feature] Move destinations from NavHost to entryProvider 
 
-Goal: When navigating to a migrated route, it is provided using `NavDisplay's entryProvider`.
+Goal: When navigating to a migrated route, it is provided using `NavDisplay`'s `entryProvider`.
 
 ### 4.1 Move composable content from NavHost into entryProvider 
 
@@ -332,9 +332,9 @@ Continue only with the feature module being migrated in the previous step.
 For each destination inside `NavHost`, do the following based the destination type:
 
 - `navigation` - do nothing
-- `composable<T>` - Copy the function into `entryProvider` and rename `composable` to `entry`, retaining the type parameter. Remove the composable content from the old `composable<T>` leaving it empty i.e., `composable<T>`{}.
-- `dialog<T>` - Same as composable but add metadata to the entry as follows: entry<T>(metadata `= DialogSceneStrategy.dialog()`)
-    - If you haven't already, add `DialogSceneStrategy` to `NavDisplay's sceneStrategy` parameter.
+- `composable<T>` - Copy the function into `entryProvider` and rename `composable` to `entry`, retaining the type parameter. Remove the composable content from the old `composable<T>` leaving it empty i.e., `composable<T>{}`.
+- `dialog<T>` - Same as composable but add metadata to the entry as follows: `entry<T>(metadata = DialogSceneStrategy.dialog()`)
+    - If you haven't already, add `DialogSceneStrategy` to `NavDisplay`'s `sceneStrategy` parameter.
 - [`bottomSheet`](https://developer.android.com/reference/kotlin/androidx/compose/material/navigation/package-summary#(androidx.navigation.NavGraphBuilder).bottomSheet(kotlin.String,kotlin.collections.List,kotlin.collections.List,kotlin.Function2)) - [Follow the bottom sheet recipe here](https://github.com/android/nav3-recipes/pull/67). This essentially the same as the instructions for `dialog` except that `BottomSheetSceneStrategy` is not part of the core Nav3 library and so should be copied/modified to your individual requirements.
 
 #### 4.1.2 Obtain navigation arguments
@@ -462,9 +462,9 @@ Goal: Within the migrated feature module, navigation events are handled by `Navi
 Steps:
 
 - Replace `NavController.popBackStack` with `Navigator.goBack`
-- Replace `NavController.navigate` with Navigator.navigate
+- Replace `NavController.navigate` with `Navigator.navigate`
 
-TODO: Add warning about `navOptions` - you'll need to modify `Navigator` behavior if you don't like what it does
+Note: Take a look at how `navOptions` is handled in `Navigator`, you'll need to modify this behavior if it doesn't suit your requirements. 
 
 For `NavController` extension functions defined by **other modules**:
 
@@ -486,9 +486,9 @@ Complete steps 3-5 for each feature module. Start with the module with the least
 
 Ensure that shared entries are not duplicated.
 
-## Step 7. Use Navigator.backStack as source of truth for navigation state 
+## Step 7. Use `Navigator.backStack` as source of truth for navigation state 
 
-### 7.1 Ensure Navigator is used instead of NavController everywhere 
+### 7.1 Ensure `Navigator` is used instead of `NavController` everywhere 
 
 Replace any remaining instances of:
 
@@ -517,7 +517,7 @@ val navigator = remember { Navigator(navController, startRoute = RouteA) }
 
 If using a common navigation component, such as a `NavBar`, change the logic for when a top level route is selected to use `Navigator.topLevelRoute`. [See example here](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step7/Step7MigrationActivity.kt#L94).
 
-In Nav2, it was necessary to have a type for both the navigation graph and the start destination of that graph (e.g. `BaseRouteA` and `RouteA`). This is no longer necessary so remove any redundant types for the navigation graph from the :`api` modules. Ensure that the correct types are used to identify top level routes.
+In Nav2, it was necessary to have a type for both the navigation graph and the start destination of that graph (e.g. `BaseRouteA` and `RouteA`). This is no longer necessary so remove any redundant types for the navigation graph from the `:api` modules. Ensure that the correct types are used to identify top level routes.
 
 ### 7.5 Remove the entryProvider fallback 
 
@@ -526,7 +526,7 @@ Remove the `fallback` parameter from `entryProvider` as there are no longer any 
 ### 7.6. Remove unused dependencies 
 
 - Remove all remaining Nav2 dependencies from the project
-- In :`core:navigation` remove any dependencies on :`feature:api` modules
+- In `:core:navigation` remove any dependencies on `:feature:api` modules
 
 Congratulations! Your project is now migrated to Navigation 3.
 
