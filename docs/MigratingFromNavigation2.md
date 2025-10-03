@@ -1,6 +1,6 @@
 # Navigation 2 to 3 migration guide
 **IMPORTANT:** This document is a 🚧work in progress🚧 and as such care should be taken when implementing the steps in this guide
-in your own app. We welcome your feedback! 
+in your own app. We welcome your feedback! For details on how to provide feedback see [this discussion](https://github.com/android/nav3-recipes/discussions/91).
 
 ## Overview 
 
