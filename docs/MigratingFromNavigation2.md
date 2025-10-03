@@ -32,7 +32,7 @@ The following features are not yet supported:
 
 ### Step-by-step code examples 
 
-A [migration recipe](https://github.com/android/nav3-recipes/tree/main) exists to accompany this guide. It starts with an activity containing only Nav2 code. The end state of each migration step is represented by another activity. Instrumented tests verify the navigation behavior in every step.
+A [migration recipe](https://github.com/android/nav3-recipes/tree/main/app/src/main/java/com/example/nav3recipes/migration) exists to accompany this guide. It starts with an activity containing only Nav2 code. The end state of each migration step is represented by another activity. Instrumented tests verify the navigation behavior in every step.
 
 To use the migration recipe as a guide:
 
