@@ -61,7 +61,7 @@ The latest dependencies can be found here: [https://developer.android.com/guide/
 - Update `lib.versions.toml` to include the Nav3 dependencies. Use the [latest version from here](https://developer.android.com/jetpack/androidx/releases/navigation3).
 
 ```
-androidxNavigation3 = "1.0.0-alpha11"
+androidxNavigation3 = "1.0.0-alpha10"
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "androidxNavigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "androidxNavigation3" }
 ```
