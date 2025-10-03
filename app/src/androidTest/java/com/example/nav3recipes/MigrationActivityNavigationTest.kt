@@ -35,13 +35,13 @@ class MigrationActivityNavigationTest(activityClass: Class<out ComponentActivity
         @Parameters(name = "{0}")
         fun data(): Collection<Array<Any>> {
             return listOf(
-                /*arrayOf(StartMigrationActivity::class.java),
+                arrayOf(StartMigrationActivity::class.java),
                 arrayOf(Step2MigrationActivity::class.java),
                 arrayOf(Step3MigrationActivity::class.java),
-                arrayOf(Step4MigrationActivity::class.java),*/
+                arrayOf(Step4MigrationActivity::class.java),
                 arrayOf(Step5MigrationActivity::class.java),
-                /*arrayOf(Step6MigrationActivity::class.java),
-                arrayOf(Step7MigrationActivity::class.java)*/
+                arrayOf(Step6MigrationActivity::class.java),
+                arrayOf(Step7MigrationActivity::class.java)
             )
         }
     }
