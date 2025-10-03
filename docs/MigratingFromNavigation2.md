@@ -27,12 +27,12 @@ The following features are not yet supported:
 - Familiarity with [navigation terminology](https://developer.android.com/guide/navigation).
 - Destinations are Composable functions. Nav3 is designed exclusively for Compose. Fragment destinations can be wrapped with [`AndroidFragment`](https://developer.android.com/reference/kotlin/androidx/fragment/compose/package-summary#AndroidFragment(androidx.compose.ui.Modifier,androidx.fragment.compose.FragmentState,android.os.Bundle,kotlin.Function1)) for interoperability with Compose.
 - Routes are strongly typed. If you are using string-based routes, [migrate to type-safe routes](https://medium.com/androiddevelopers/type-safe-navigation-for-compose-105325a97657) first ([example](https://github.com/android/nowinandroid/pull/1413)).
-- Optional but highly recommended: test coverage that verifies existing navigation behavior. These will ensure that during migration, navigation behavior is not changed. See [here for an example of navigation tests](https://github.com/android/nav3-recipes/blob/dt/2to3migration/app/src/androidTest/java/com/example/nav3recipes/MigrationActivityNavigationTest.kt).
+- Optional but highly recommended: test coverage that verifies existing navigation behavior. These will ensure that during migration, navigation behavior is not changed. See [here for an example of navigation tests](https://github.com/android/nav3-recipes/blob/main/app/src/androidTest/java/com/example/nav3recipes/MigrationActivityNavigationTest.kt).
 - Your app must have a [minSdk](https://developer.android.com/guide/topics/manifest/uses-sdk-element#min) of 23 or above.
 
 ### Step-by-step code examples 
 
-A [migration recipe](https://github.com/android/nav3-recipes/tree/dt/2to3migration) exists to accompany this guide. It starts with an activity containing only Nav2 code. The end state of each migration step is represented by another activity. Instrumented tests verify the navigation behavior in every step.
+A [migration recipe](https://github.com/android/nav3-recipes/tree/main) exists to accompany this guide. It starts with an activity containing only Nav2 code. The end state of each migration step is represented by another activity. Instrumented tests verify the navigation behavior in every step.
 
 To use the migration recipe as a guide:
 
@@ -98,7 +98,7 @@ Important: A fundamental difference between Nav2 and Nav3 is that **you own the 
 
 To aid with migration, a class which provides and manages a back stack named `Navigator` is provided for you. It is not part of the Nav3 library and it does not provide all the features of Nav2. Instead it is intended to be an assistant during migration, and after to be a starting point for you to implement your own navigation behavior and logic.
 
-Copy the [`Navigator`](https://github.com/android/nav3-recipes/blob/dt/2to3migration/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt) to the :`core:navigation` module. This class contains `backStack: SnapshotStateList<Any>` that can be used with `NavDisplay.It` will mirror `NavController`'s back stack ensuring that Nav2's state remains the source of truth throughout migration. After the migration is complete, the NavController mirroring code will be removed.
+Copy the [`Navigator`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt) to the :`core:navigation` module. This class contains `backStack: SnapshotStateList<Any>` that can be used with `NavDisplay.It` will mirror `NavController`'s back stack ensuring that Nav2's state remains the source of truth throughout migration. After the migration is complete, the NavController mirroring code will be removed.
 
 ### 2.2 Make the Navigator available everywhere that NavController is 
 
@@ -309,8 +309,8 @@ Taking the code example from above. The starting route is A.
 
 Review the provided `Navigator` class to ensure that it can model your app's current navigation behavior. In particular:
 
-- Review the [`add`](https://github.com/android/nav3-recipes/blob/dt/2to3migration/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt#L142)
-- Note that `popUpTo` in the [`navigate`](https://github.com/android/nav3-recipes/blob/dt/2to3migration/app/src/main/java/com/example/nav3recipes/migration/step7/Navigator.kt#L121) will be ignored when switching to Nav3 in the final step. There is no equivalent to `popUpTo` in Nav3 because you control the back stack. The supplied `Navigator` class does, however, include logic to pop all top level stacks up to the starting stack when navigating to a new top level route. This behavior can be toggled using `canTopLevelRoutesExistTogether`.
+- Review the [`add`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt#L142)
+- Note that `popUpTo` in the [`navigate`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step7/Navigator.kt#L121) will be ignored when switching to Nav3 in the final step. There is no equivalent to `popUpTo` in Nav3 because you control the back stack. The supplied `Navigator` class does, however, include logic to pop all top level stacks up to the starting stack when navigating to a new top level route. This behavior can be toggled using `canTopLevelRoutesExistTogether`.
 
 #### 3.2.2 Update routes to implement marker interfaces
 
@@ -503,7 +503,7 @@ Replace any remaining instances of:
     - Uncomment the code that modifies the back stack directly
 - Remove all code which references `NavController`
 
-The final `Navigator` [should look like this](https://github.com/android/nav3-recipes/blob/dt/2to3migration/app/src/main/java/com/example/nav3recipes/migration/step7/Navigator.kt#L15).
+The final `Navigator` [should look like this](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step7/Navigator.kt#L15).
 
 ### 7.3 Set the app's start route 
 
@@ -515,7 +515,7 @@ val navigator = remember { Navigator(navController, startRoute = RouteA) }
 
 ### 7.4 Update common navigation UI components 
 
-If using a common navigation component, such as a `NavBar`, change the logic for when a top level route is selected to use `Navigator.topLevelRoute`. [See example here](https://github.com/android/nav3-recipes/blob/dt/2to3migration/app/src/main/java/com/example/nav3recipes/migration/step7/Step7MigrationActivity.kt#L94).
+If using a common navigation component, such as a `NavBar`, change the logic for when a top level route is selected to use `Navigator.topLevelRoute`. [See example here](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step7/Step7MigrationActivity.kt#L94).
 
 In Nav2, it was necessary to have a type for both the navigation graph and the start destination of that graph (e.g. `BaseRouteA` and `RouteA`). This is no longer necessary so remove any redundant types for the navigation graph from the :`api` modules. Ensure that the correct types are used to identify top level routes.
 
