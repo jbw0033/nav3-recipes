@@ -26,7 +26,7 @@ The following features are not yet supported:
 
 - Familiarity with [navigation terminology](https://developer.android.com/guide/navigation).
 - Destinations are Composable functions. Nav3 is designed exclusively for Compose. Fragment destinations can be wrapped with [`AndroidFragment`](https://developer.android.com/reference/kotlin/androidx/fragment/compose/package-summary#AndroidFragment(androidx.compose.ui.Modifier,androidx.fragment.compose.FragmentState,android.os.Bundle,kotlin.Function1)) for interoperability with Compose.
-- Routes are strongly typed. If you are using string-based routes, [migrate to type-safe routes](https://medium.com/androiddevelopers/type-safe-navigation-for-compose-105325a97657)).
+- Routes are strongly typed. If you are using string-based routes, [migrate to type-safe routes](https://medium.com/androiddevelopers/type-safe-navigation-for-compose-105325a97657) first ([example](https://github.com/android/nowinandroid/pull/1413)).
 - Optional but highly recommended: test coverage that verifies existing navigation behavior. These will ensure that during migration, navigation behavior is not changed. See [here for an example of navigation tests](https://github.com/android/nav3-recipes/blob/dt/2to3migration/app/src/androidTest/java/com/example/nav3recipes/MigrationActivityNavigationTest.kt).
 - Your app must have a [minSdk](https://developer.android.com/guide/topics/manifest/uses-sdk-element#min) of 23 or above.
 
