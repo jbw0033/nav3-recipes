@@ -19,6 +19,9 @@ package com.example.nav3recipes.material.listdetail
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -27,13 +30,20 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
+import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.navEntryDecorator
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
 import com.example.nav3recipes.content.ContentRed
@@ -57,12 +67,40 @@ private data object Profile : NavKey
 
 class MaterialListDetailActivity : ComponentActivity() {
 
-    @OptIn(ExperimentalMaterial3AdaptiveApi::class)
+    @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         setEdgeToEdgeConfig()
         super.onCreate(savedInstanceState)
 
         setContent {
+
+
+            val localNavSharedTransitionScope: ProvidableCompositionLocal<SharedTransitionScope> =
+                compositionLocalOf {
+                    throw IllegalStateException(
+                        "Unexpected access to LocalNavSharedTransitionScope. You must provide a " +
+                                "SharedTransitionScope from a call to SharedTransitionLayout() or " +
+                                "SharedTransitionScope()"
+                    )
+                }
+
+            /**
+             * A [NavEntryDecorator] that wraps each entry in a shared element that is controlled by the
+             * [Scene].
+             */
+            val sharedEntryInSceneNavEntryDecorator = navEntryDecorator<NavKey> { entry ->
+                with(localNavSharedTransitionScope.current) {
+                    Box(
+                        Modifier.sharedElement(
+                            rememberSharedContentState(entry.contentKey),
+                            animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        ),
+                    ) {
+                        entry.Content()
+                    }
+                }
+            }
+
 
             val backStack = rememberNavBackStack(ConversationList)
 
@@ -79,6 +117,11 @@ class MaterialListDetailActivity : ComponentActivity() {
                 backStack = backStack,
                 onBack = { keysToRemove -> repeat(keysToRemove) { backStack.removeLastOrNull() } },
                 sceneStrategy = listDetailStrategy,
+                entryDecorators = listOf(
+                    sharedEntryInSceneNavEntryDecorator,
+                    rememberSceneSetupNavEntryDecorator(),
+                    rememberSavedStateNavEntryDecorator()
+                ),
                 entryProvider = entryProvider {
                     entry<ConversationList>(
                         metadata = ListDetailSceneStrategy.listPane(
