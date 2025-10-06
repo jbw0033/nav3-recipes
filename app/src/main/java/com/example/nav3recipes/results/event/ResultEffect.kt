@@ -19,7 +19,7 @@ inline fun <reified T> ResultEffect(
     crossinline onResult: suspend (T) -> Unit
 ) {
     LaunchedEffect(resultKey, resultEventBus.channelMap[resultKey]) {
-        resultEventBus.getResultFlow<T>()?.collect { result ->
+        resultEventBus.getResultFlow<T>(resultKey)?.collect { result ->
             onResult.invoke(result as T)
         }
     }
