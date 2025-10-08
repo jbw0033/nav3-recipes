@@ -163,8 +163,8 @@ Choose **a single feature module** that does not contain the start destination f
 Create the `api` module:
 
 - Create a new feature module named `:<existingfeaturename>:api`
-- Move the routes into it
-- Apply the KotlinX Serialization plugin to the module by updating the `build.gradle.kts`
+- Move only the navigation routes into it, leave everything else
+- Apply the KotlinX Serialization plugin to the module by updating `build.gradle.kts`
 
 Update the `:core:navigation` module:
 
