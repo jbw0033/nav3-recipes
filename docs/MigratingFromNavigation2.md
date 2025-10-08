@@ -91,6 +91,8 @@ dependencies {
 - Update minSdk to 23 or above
 - Update AGP to 8.9.3 or above
 
+Ensure that navigation tests pass. 
+
 ## Step 2. Create a back stack and use it with NavDisplay 
 
 ### 2.1 Add the Navigator class 
@@ -147,6 +149,8 @@ Box {
     )
 }
 ```
+
+Ensure that navigation tests pass.
 
 ## Step 3. [Single feature] Migrate routes 
 
@@ -319,6 +323,7 @@ Steps:
 
 - Update each top level route so that it implements the `Route.TopLevel` interface provided by `Navigator.kt`
 - Update each shared route so that it implements the `Route.Shared` interface provided by `Navigator.kt`
+- Ensure that navigation tests pass
 
 ## Step 4. [Single feature] Move destinations from NavHost to entryProvider 
 
@@ -456,6 +461,8 @@ You should now be able to navigate to, and back from, the migrated destinations.
 
 **Note**: When navigating (both forward and back) between destinations handled by `NavHost` and `NavDisplay`, you may see the blank destination until the transition animation has completed.
 
+Ensure that navigation tests pass.
+
 ## Step 5. [Single feature] Replace NavController with Navigator  
 
 Goal: Within the migrated feature module, navigation events are handled by `Navigator` instead of `NavController`
@@ -479,6 +486,8 @@ Remove Nav2 imports and module dependencies:
 
 At this point, this feature module has been fully migrated to Nav3.
 
+Ensure that navigation tests pass.
+
 ## Step 6. Migrate all feature modules  
 
 Goal: Feature modules use Nav3. They don't contain any Nav2 code.
@@ -486,6 +495,8 @@ Goal: Feature modules use Nav3. They don't contain any Nav2 code.
 Complete steps 3-5 for each feature module. Start with the module with the least dependencies and end with the module that contains the start route.
 
 Ensure that shared entries are not duplicated.
+
+After each feature module has been migrated, ensure that navigation tests pass.
 
 ## Step 7. Use `Navigator.backStack` as source of truth for navigation state 
 
@@ -528,6 +539,9 @@ Remove the `fallback` parameter from `entryProvider` as there are no longer any 
 
 - Remove all remaining Nav2 dependencies from the project
 - In `:core:navigation` remove any dependencies on `:feature:api` modules
+
+### 7.7 Run navigation tests
+Ensure that all navigation tests pass.
 
 Congratulations! Your project is now migrated to Navigation 3.
 
