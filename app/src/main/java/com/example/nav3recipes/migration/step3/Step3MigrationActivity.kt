@@ -61,6 +61,8 @@ import com.example.nav3recipes.content.ContentMauve
 import com.example.nav3recipes.content.ContentPink
 import com.example.nav3recipes.content.ContentPurple
 import com.example.nav3recipes.content.ContentRed
+import com.example.nav3recipes.migration.start.Navigator
+import com.example.nav3recipes.migration.start.Route
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
@@ -107,7 +109,12 @@ class Step3MigrationActivity : ComponentActivity() {
         setContent {
             val coroutineScope = rememberCoroutineScope()
             val navController = rememberNavController()
-            val navigator = remember { Navigator(coroutineScope, navController) }
+            val navigator = remember {
+                Navigator(
+                    navController = navController,
+                    coroutineScope = coroutineScope
+                )
+            }
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
             Scaffold(bottomBar = {

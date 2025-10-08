@@ -61,39 +61,35 @@ import com.example.nav3recipes.content.ContentMauve
 import com.example.nav3recipes.content.ContentPink
 import com.example.nav3recipes.content.ContentPurple
 import com.example.nav3recipes.content.ContentRed
+import com.example.nav3recipes.migration.start.Navigator
+import com.example.nav3recipes.migration.start.Route
+import com.example.nav3recipes.migration.start.toRouteOrNull
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
 @Serializable
-data object BaseRouteA
+private data object BaseRouteA
+@Serializable
+private data object RouteA
+@Serializable
+private data object RouteA1
 
 @Serializable
-data object RouteA
+private data object BaseRouteB
+@Serializable
+private data object RouteB : Route.TopLevel
+@Serializable
+private data class RouteB1(val id: String)
 
 @Serializable
-data object RouteA1
-
+private data object BaseRouteC
 @Serializable
-data object BaseRouteB
-
+private data object RouteC
 @Serializable
-data object RouteB : Route.TopLevel
-
+private data object RouteD
 @Serializable
-data class RouteB1(val id: String)
-
-@Serializable
-data object BaseRouteC
-
-@Serializable
-data object RouteC
-
-@Serializable
-data object RouteD
-
-@Serializable
-data object RouteE
+private data object RouteE : Route.Shared
 
 private val TOP_LEVEL_ROUTES = mapOf(
     BaseRouteA to NavBarItem(icon = Icons.Default.Home, description = "Route A"),
@@ -118,7 +114,17 @@ class Step4MigrationActivity : ComponentActivity() {
             val coroutineScope = rememberCoroutineScope()
             val navController = rememberNavController()
             val navigator =
-                remember { Navigator(coroutineScope, navController, shouldPrintDebugInfo = true) }
+                remember {
+                    Navigator(
+                        navController = navController,
+                        coroutineScope = coroutineScope,
+                        entryToRouteMapper = { entry ->
+                            entry.toRouteOrNull<RouteB>()
+                                ?: entry.toRouteOrNull<RouteB1>()
+                                ?: entry.toRouteOrNull<RouteE>()
+                        }
+                    )
+                }
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
             Scaffold(bottomBar = {

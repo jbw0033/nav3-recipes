@@ -21,7 +21,6 @@ import kotlin.collections.iterator
 @SuppressLint("RestrictedApi")
 class Navigator (
     private var startRoute: Route,
-    private var canTopLevelRoutesExistTogether: Boolean = false,
     private var shouldPrintDebugInfo: Boolean = false,
 ) {
 
@@ -78,10 +77,7 @@ class Navigator (
 
             // Get the existing stack or create a new one.
             val topLevelStack = topLevelStacks.remove(route) ?: mutableListOf(route)
-
-            if (!canTopLevelRoutesExistTogether) {
-                clearAllExceptStartStack()
-            }
+            clearAllExceptStartStack()
 
             topLevelStacks.put(route, topLevelStack)
             navlog("Added top level route $route")
@@ -157,7 +153,6 @@ class Navigator (
                 savedState.write {
 
                     putSavedState(KEY_START_ROUTE, encodeToSavedState(navigator.startRoute))
-                    putBoolean(KEY_CAN_TOP_LEVEL_ROUTES_EXIST_TOGETHER, navigator.canTopLevelRoutesExistTogether)
                     putBoolean(KEY_SHOULD_PRINT_DEBUG_INFO, navigator.shouldPrintDebugInfo)
                     putSavedState(KEY_TOP_LEVEL_ROUTE, encodeToSavedState(navigator.topLevelRoute))
 
@@ -194,7 +189,6 @@ class Navigator (
 
                     val navigator = Navigator(
                         startRoute = restoredStartRoute,
-                        canTopLevelRoutesExistTogether = restoredCanTopLevelRoutesExistTogether,
                         shouldPrintDebugInfo = restoredShouldPrintDebugInfo
                     )
 
@@ -238,7 +232,6 @@ fun rememberNavigator(
 ) = rememberSaveable(saver = Navigator.Saver){
     Navigator(
         startRoute = startRoute,
-        canTopLevelRoutesExistTogether = canTopLevelRoutesExistTogether,
         shouldPrintDebugInfo = shouldPrintDebugInfo
     )
 }

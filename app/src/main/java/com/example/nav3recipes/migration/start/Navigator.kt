@@ -1,35 +1,42 @@
-package com.example.nav3recipes.migration.step2
+package com.example.nav3recipes.migration.start
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.toRoute
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /**
  * Navigator that mirrors `NavController`'s back stack
+ *
+ * @param navController - The NavController whose back stack to mirror
+ * @param coroutineScope - Scope used to collect changes from the NavController
+ * @param entryToRouteMapper - Lambda that converts an entry in NavController's back stack
+ * into a route that is stored in the `Navigator`'s back stack.
+ *
+ * For example: { entry -> entry.toRouteOrNull<RouteA>() ?: entry.toRouteOrNull<RouteB>() }
+ *
+ * @param shouldPrintDebugInfo - Prints debug info to logcat
  */
 @SuppressLint("RestrictedApi")
 class Navigator(
-    coroutineScope: CoroutineScope,
     private val navController: NavHostController,
-    private val startRoute: Any = Unit,
-    private val canTopLevelRoutesExistTogether: Boolean = false,
+    coroutineScope: CoroutineScope,
+    entryToRouteMapper: (NavBackStackEntry) -> Any? = { null },
     private val shouldPrintDebugInfo: Boolean = false
 ) {
 
-    val backStack = mutableStateListOf(startRoute)
-    var topLevelRoute by mutableStateOf(startRoute)
+    private val startRoute = Unit
+
+    val backStack = mutableStateListOf<Any>(startRoute)
+    var topLevelRoute by mutableStateOf<Any>(startRoute)
         private set
 
     // Maintain a stack for each top level route
@@ -37,8 +44,6 @@ class Navigator(
 
     // Maintain a map of shared routes to their parent stacks
     private var sharedRoutes: MutableMap<Any, Any> = mutableMapOf()
-
-    //val coroutineScope = CoroutineScope(Job())
 
     init {
         inititalizeTopLevelStacks()
@@ -52,13 +57,7 @@ class Navigator(
                     val destination = entry.destination
 
                     if (destination.navigatorName == "composable" || destination.navigatorName == "dialog"){
-                        val route =
-                            // Add migrated routes here
-                            if (false) {
-                            } else {
-                                // Non migrated top level route
-                                entry
-                            }
+                        val route = entryToRouteMapper(entry) ?: entry
                         add(route)
                     } else {
                         navlog("Ignoring $entry")
@@ -117,10 +116,7 @@ class Navigator(
 
             // Get the existing stack or create a new one.
             val topLevelStack = topLevelStacks.remove(route) ?: mutableListOf(route)
-
-            if (!canTopLevelRoutesExistTogether) {
-                clearAllExceptStartStack()
-            }
+            clearAllExceptStartStack()
 
             topLevelStacks.put(route, topLevelStack)
             navlog("Added top level route $route")
@@ -130,7 +126,7 @@ class Navigator(
 
     private fun clearAllExceptStartStack() {
         // Remove all other top level stacks, except the start stack
-        val startStack = topLevelStacks[startRoute] ?: mutableListOf(startRoute)
+        val startStack = topLevelStacks[startRoute] ?: mutableListOf<Any>(startRoute)
         topLevelStacks.clear()
         topLevelStacks.put(startRoute, startStack)
     }
@@ -168,7 +164,7 @@ class Navigator(
     fun navigate(route: Any, navOptions: NavOptions? = null) {
         navController.navigate(route, navOptions)
 
-        // Uncomment the code below and delete the line as per migration guide
+        // Uncomment the code below and delete the line above as per migration guide
         /*
         add(route)
         updateBackStack()
@@ -181,7 +177,7 @@ class Navigator(
     fun goBack() {
         navController.popBackStack()
 
-        // Uncomment the code below and delete the line as per migration guide
+        // Uncomment the code below and delete the line above as per migration guide
         /*
         if (backStack.size <= 1) {
             return
@@ -195,6 +191,28 @@ class Navigator(
     }
 }
 
+/**
+ * Tries to convert a [NavBackStackEntry] to a route of type [T].
+ * Returns the typed route if the entry's destination matches [T], otherwise returns null.
+ */
+inline fun <reified T : Any> NavBackStackEntry.toRouteOrNull(): T? =
+    if (this.destination.hasRoute<T>()) {
+        this.toRoute<T>()
+    } else {
+        null
+    }
+
+/**
+ * A marker interface for navigation routes.
+ *
+ * - Implementing the base interface, `Route`, indicates that this is a standard navigation route
+ * - Implementing the `TopLevel` interface indicates that this is a top level route, and has a
+ * sub stack of `Route`s
+ * - Implementing the `Shared` interface indicates that this route can be placed onto any sub stack,
+ * it is shared between top level stacks.
+ *
+ * @see `Navigator` for how these types are handled.
+ */
 sealed interface Route {
     interface TopLevel : Route
     interface Shared : Route
