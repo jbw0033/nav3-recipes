@@ -196,11 +196,7 @@ class Navigator(
  * Returns the typed route if the entry's destination matches [T], otherwise returns null.
  */
 inline fun <reified T : Any> NavBackStackEntry.toRouteOrNull(): T? =
-    if (this.destination.hasRoute<T>()) {
-        this.toRoute<T>()
-    } else {
-        null
-    }
+    if (destination.hasRoute<T>()) toRoute<T>() else null
 
 /**
  * A marker interface for navigation routes.
