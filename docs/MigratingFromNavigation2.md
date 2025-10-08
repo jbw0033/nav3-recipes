@@ -16,11 +16,12 @@ This guide covers the migration of the following Nav2 features:
 - Shared destinations - ones that can appear in different navigation graphs
 - Dialog destinations
 
+#### Not supported
 The following features are not yet supported:
 
 - More than one level of nested navigation
 - [Custom destination types](https://developer.android.com/guide/navigation/design/kotlin-dsl#custom)
-- Deeplinks
+- Deeplinks (hence [`NavController.navigateUp`]([url](https://developer.android.com/reference/androidx/navigation/NavController#navigateUp())) is not supported because the only time that "up" and "back" differ is when working with a synthetic back stack)
 
 ### Prerequisites 
 
