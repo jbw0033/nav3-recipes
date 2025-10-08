@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.nav3recipes.decorators.toplevelstacks
+package com.example.nav3recipes.decorators.nowinandroid
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -57,23 +57,25 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data object RouteA : Route.TopLevel()
-@Serializable
-data object RouteA1 : Route()
+data object RouteA : NiaNavKey { override val isTopLevel = true }
 
 @Serializable
-data object RouteB : Route.TopLevel()
-@Serializable
-data class RouteB1(val id: String) : Route()
+data object RouteA1 : NiaNavKey { override val isTopLevel = false }
 
 @Serializable
-data object RouteC : Route.TopLevel()
+data object RouteB : NiaNavKey { override val isTopLevel = true }
 @Serializable
-data object RouteD : Route()
-@Serializable
-data object RouteE : Route.Shared()
+data class RouteB1(val id: String) : NiaNavKey { override val isTopLevel = false }
 
-private val TOP_LEVEL_ROUTES = mapOf<Route, NavBarItem>(
+@Serializable
+data object RouteC : NiaNavKey { override val isTopLevel = true }
+@Serializable
+data object RouteD : NiaNavKey { override val isTopLevel = false }
+
+@Serializable
+//data object RouteE : Route.Shared()
+
+private val TOP_LEVEL_ROUTES = mapOf<NiaNavKey, NavBarItem>(
     RouteA to NavBarItem(icon = Icons.Default.Home, description = "Route A"),
     RouteB to NavBarItem(icon = Icons.Default.Face, description = "Route B"),
     RouteC to NavBarItem(icon = Icons.Default.Camera, description = "Route C"),
@@ -93,9 +95,14 @@ class TopLevelStacksActivity : ComponentActivity() {
 
         setContent {
 
-            val navigator = rememberNavigator(startRoute = RouteA, canTopLevelRoutesExistTogether = true, shouldPrintDebugInfo = true)
 
-            val entryProvider = entryProvider<Route> {
+            /*rememberNavigator(
+                startRoute = RouteA,
+                canTopLevelRoutesExistTogether = true,
+                shouldPrintDebugInfo = true
+            )*/
+
+            val entryProvider = entryProvider<NiaNavKey> {
                 featureASection(
                     onSubRouteClick = { navigator.navigate(RouteA1) },
                     onDialogClick = { navigator.navigate(RouteD) },
@@ -117,6 +124,8 @@ class TopLevelStacksActivity : ComponentActivity() {
                     )
                 }
             }
+
+            val navigator = NiaNavigator(RouteA,  )
 
             val saveableStateHolder = rememberSaveableStateHolder()
 
