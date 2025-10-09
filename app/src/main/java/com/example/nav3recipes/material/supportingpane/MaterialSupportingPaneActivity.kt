@@ -83,7 +83,7 @@ class MaterialSupportingPaneActivity : ComponentActivity() {
 
             NavDisplay(
                 backStack = backStack,
-                onBack = { numKeysToRemove -> repeat(numKeysToRemove) { backStack.removeLastOrNull() } },
+                onBack = { backStack.removeLastOrNull() },
                 sceneStrategy = supportingPaneStrategy,
                 entryProvider = entryProvider {
                     entry<MainVideo>(

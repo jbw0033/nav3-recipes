@@ -400,7 +400,7 @@ NavDisplay(...,
 
 #### 4.2.1 Move NavGraphBuilder extension functions
 
-[`NavGraphBuilder`](https://developer.android.com/guide/navigation/design/encapsulate) [extension functions](https://developer.android.com/guide/navigation/design/encapsulate) can be refactored to `EntryProviderBuilder` extension functions. These functions can then be called inside `entryProvider`.
+[`NavGraphBuilder`](https://developer.android.com/guide/navigation/design/encapsulate) [extension functions](https://developer.android.com/guide/navigation/design/encapsulate) can be refactored to `EntryProviderScope` extension functions. These functions can then be called inside `entryProvider`.
 
 Refactoring `NavHost`:
 
@@ -413,7 +413,7 @@ Refactoring `NavHost`:
 
 Refactoring the extension function:
 
-- Change the method signature from `NavGraphBuilder.existingScreen()` to `EntryProviderBuilder<Any>.existingScreen()`.
+- Change the method signature from `NavGraphBuilder.existingScreen()` to `EntryProviderScope<Any>.existingScreen()`.
 - Remove `navigation` destinations, leaving only the destinations they contain.
 - Replace `composable` and `dialog` destinations with `entry`
     - For `dialog` destinations add the dialog metadata following the instructions in the previous step
@@ -447,7 +447,7 @@ NavDisplay(..., entryProvider = entryProvider {
     featureBSection()
 })
 
-private fun EntryProviderBuilder<Any>.featureBSection() {
+private fun EntryProviderScope<Any>.featureBSection() {
     entry<RouteB> { ContentRed("Route B title") }
 }
 ```
