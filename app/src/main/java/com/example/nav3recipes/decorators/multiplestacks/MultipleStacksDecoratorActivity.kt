@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 import kotlinx.serialization.Serializable
@@ -44,7 +44,7 @@ class MultipleStacksDecoratorActivity : ComponentActivity() {
             val favoritesBackStack = remember { mutableStateListOf<NavKey>(FavoritesKey) }
 
             // Decorator for saving state
-            val savedStateDecorator = rememberSavedStateNavEntryDecorator<NavKey>()
+            val savedStateDecorator = rememberSaveableStateHolderNavEntryDecorator<NavKey>()
 
             // Common entryProvider for all screens
             val commonEntryProvider = entryProvider {

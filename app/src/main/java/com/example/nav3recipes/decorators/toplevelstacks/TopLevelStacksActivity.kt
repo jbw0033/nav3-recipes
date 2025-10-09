@@ -32,7 +32,11 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -91,7 +95,7 @@ class TopLevelStacksActivity : ComponentActivity() {
 
         setContent {
 
-            val navigator = rememberNavigator(startRoute = RouteA, canTopLevelRoutesExistTogether = true, shouldPrintDebugInfo = true)
+            val navigator = rememberNavigator(startRoute = RouteA, shouldPrintDebugInfo = true)
 
             val entryProvider = entryProvider<Route> {
                 featureASection(
@@ -116,6 +120,10 @@ class TopLevelStacksActivity : ComponentActivity() {
                 }
             }
 
+
+
+/*
+
             val decorators = listOf<NavEntryDecorator<Route>>(
                 rememberSaveableStateHolderNavEntryDecorator()
             )
@@ -125,6 +133,7 @@ class TopLevelStacksActivity : ComponentActivity() {
                 entryDecorators = decorators,
                 entryProvider = entryProvider
             )
+*/
 
             Scaffold(bottomBar = {
                 NavigationBar {
@@ -149,7 +158,7 @@ class TopLevelStacksActivity : ComponentActivity() {
 
             { paddingValues ->
                 NavDisplay(
-                    entries = decoratedEntries,
+                    entries = navigator.entries(entryProvider = entryProvider),
                     onBack = { navigator.goBack() },
                     sceneStrategy = remember { DialogSceneStrategy() },
                     modifier = Modifier.padding(paddingValues)
@@ -204,7 +213,16 @@ private fun EntryProviderScope<Route>.featureBSection(
         }
     }
     entry<RouteB1> { key ->
-        ContentPurple("Route B1 title. ID: ${key.id}")
+        ContentPurple("Route B1 title. ID: ${key.id}"){
+            var count by rememberSaveable {
+                mutableIntStateOf(0)
+            }
+
+            Button(onClick = { count++ }){
+               Text("Value: $count")
+            }
+
+        }
     }
 }
 

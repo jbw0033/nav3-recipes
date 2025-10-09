@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
@@ -30,7 +30,7 @@ class BasicDecoratorActivity : ComponentActivity() {
             val backStack = remember { mutableStateListOf<Any>(RouteA) }
             val decoratedEntries = rememberDecoratedNavEntries(
                 backStack = backStack,
-                entryDecorators = listOf(rememberSavedStateNavEntryDecorator()),
+                entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator()),
                 entryProvider = entryProvider {
                     entry<RouteA> {
                         ContentGreen("Welcome to Nav3") {
