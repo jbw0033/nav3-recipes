@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.serialization.decodeFromSavedState
@@ -34,6 +35,12 @@ class Navigator (
 
     // Maintain a map of shared routes to their parent stacks
     private var sharedRoutes : MutableMap<Route, Route> = mutableMapOf()
+
+    @Composable
+    fun entries() : SnapshotStateList<Route> {
+
+
+    }
 
     private fun updateBackStack() {
         backStack.apply {

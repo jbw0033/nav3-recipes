@@ -1,4 +1,4 @@
-package com.example.nav3recipes.decorators.nowinandroid
+package com.example.nav3recipes.decorators.toplevelstacks
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,7 +12,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Provider
 import kotlin.collections.forEach
@@ -118,7 +118,7 @@ class NiaNavigator(
         return rememberDecoratedNavEntries(
             backStack = backStack,
             entryDecorators = listOf(
-                rememberSavedStateNavEntryDecorator(),
+                rememberSaveableStateHolderNavEntryDecorator(),
                 rememberViewModelStoreNavEntryDecorator(),
             ),
             entryProvider = entryProvider {
