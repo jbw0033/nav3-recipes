@@ -181,7 +181,7 @@ Choose **a single feature module** that does not contain the start destination f
 Create the `api` module:
 
 - Create a new feature module named `:<existingfeaturename>:api`
-- Move only the navigation routes into it, leave everything else
+- Move only the navigation routes into it. Typically, these are simple data classes and objects and should be moved into a single file named `<feature_name>Routes.kt`. Everything else should be moved into the `impl` module (see below). 
 - Apply the KotlinX Serialization plugin to the module by updating `build.gradle.kts`
 
 Create the `impl` module:
@@ -335,7 +335,7 @@ Review the provided `Navigator` class to ensure that it can model your app's cur
 
 Steps:
 
-- Update each top level route so that it implements the `Route.TopLevel` interface provided by `Navigator.kt`
+- Update each top level route within the feature so that it implements the `Route.TopLevel` interface provided by `Navigator.kt`
 - Update each shared route so that it implements the `Route.Shared` interface provided by `Navigator.kt`
 - Ensure that navigation tests pass
 
