@@ -33,7 +33,7 @@ class ModularActivity : ComponentActivity() {
     lateinit var navigator: Navigator
 
     @Inject
-    lateinit var EntryProviderScopes: Set<@JvmSuppressWildcards EntryProviderInstaller>
+    lateinit var entryProviderScopes: Set<@JvmSuppressWildcards EntryProviderInstaller>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +45,7 @@ class ModularActivity : ComponentActivity() {
                     modifier = Modifier.padding(paddingValues),
                     onBack = { navigator.goBack() },
                     entryProvider = entryProvider {
-                        EntryProviderScopes.forEach { builder -> this.builder() }
+                        entryProviderScopes.forEach { builder -> this.builder() }
                     }
                 )
             }
