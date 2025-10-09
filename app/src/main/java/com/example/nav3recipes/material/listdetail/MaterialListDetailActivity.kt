@@ -77,7 +77,7 @@ class MaterialListDetailActivity : ComponentActivity() {
 
             NavDisplay(
                 backStack = backStack,
-                onBack = { keysToRemove -> repeat(keysToRemove) { backStack.removeLastOrNull() } },
+                onBack = { backStack.removeLastOrNull() },
                 sceneStrategy = listDetailStrategy,
                 entryProvider = entryProvider {
                     entry<ConversationList>(

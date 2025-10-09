@@ -50,7 +50,7 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import androidx.navigation3.runtime.EntryProviderBuilder
+import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.DialogSceneStrategy
@@ -216,7 +216,7 @@ class Step6MigrationActivity : ComponentActivity() {
     }
 }
 
-private fun EntryProviderBuilder<Any>.featureASection(
+private fun EntryProviderScope<Any>.featureASection(
     onSubRouteClick: () -> Unit,
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit,
@@ -240,7 +240,7 @@ private fun EntryProviderBuilder<Any>.featureASection(
     entry<RouteE> { ContentBlue("Route E title") }
 }
 
-private fun EntryProviderBuilder<Any>.featureBSection(
+private fun EntryProviderScope<Any>.featureBSection(
     onDetailClick: (id: String) -> Unit,
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit
@@ -265,7 +265,7 @@ private fun EntryProviderBuilder<Any>.featureBSection(
     }
 }
 
-private fun EntryProviderBuilder<Any>.featureCSection(
+private fun EntryProviderScope<Any>.featureCSection(
     onDialogClick: () -> Unit,
     onOtherClick: () -> Unit,
 ) {
