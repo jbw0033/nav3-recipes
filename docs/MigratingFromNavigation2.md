@@ -101,19 +101,37 @@ Important: A fundamental difference between Nav2 and Nav3 is that **you own the 
 
 To aid with migration, a class which provides and manages a back stack named `Navigator` is provided for you. It is not part of the Nav3 library and it does not provide all the features of Nav2. Instead, it is intended to be an assistant during migration, and after to be a starting point for you to implement your own navigation behavior and logic.
 
-Copy the [`Navigator`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt) to the `:core:navigation` module. This class contains `backStack: SnapshotStateList<Any>` that can be used with `NavDisplay`. It will mirror `NavController`'s back stack ensuring that Nav2's state remains the source of truth throughout migration. After the migration is complete, the NavController mirroring code will be removed.
+Copy the [`Navigator`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/start/Navigator.kt) to the `:core:navigation` module. This class provides `backStack: SnapshotStateList<Any>` that can be used with `NavDisplay`. It will mirror `NavController`'s back stack ensuring that Nav2's state remains the source of truth throughout migration. It does this by observing `NavController`'s back stack and converting the entries that have been migrated to Nav3 using the `entryToRouteMapper` lambda parameter. This converts `NavBackStackEntry`s that have been migrated to Nav3 back into a plain route. The `NavBackStackEntry.toRouteOrNull` extension method is provided in `Navigator.kt` to assist with this conversion.    
+
+For example, if `RouteA` and `RouteB` have been migrated, the following lambda should be used for `entryToRouteMapper`: 
+
+```
+entryToRouteMapper = { entry ->
+    entry.toRouteOrNull<RouteA>()
+        ?: entry.toRouteOrNull<RouteB>()
+}
+```
+
+After the migration is complete, the NavController mirroring code will be removed.
 
 ### 2.2 Make the Navigator available everywhere that NavController is 
 
 Goal: The `Navigator` class is available everywhere that `NavController` is used.
 
+- Create a `CoroutineScope` that `Navigator` can use to observe `NavController`'s back stack
 - Create the `Navigator` immediately after `NavController` is created
 
 Example:
 
 ```
 val navController = rememberNavController()
-val navigator = remember { Navigator(navController) }
+val coroutineScope = rememberCoroutineScope()
+val navigator = remember { 
+  Navigator(
+    navController = navController,
+    coroutineScope = coroutineScope
+  ) 
+}
 ```
 
 - Do a project-wide search for "NavController" and "NavHostController"
@@ -163,12 +181,8 @@ Choose **a single feature module** that does not contain the start destination f
 Create the `api` module:
 
 - Create a new feature module named `:<existingfeaturename>:api`
-- Move only the navigation routes into it, leave everything else
+- Move only the navigation routes into it. Typically, these are simple data classes and objects and should be moved into a single file named `<feature_name>Routes.kt`. Everything else should be moved into the `impl` module (see below). 
 - Apply the KotlinX Serialization plugin to the module by updating `build.gradle.kts`
-
-Update the `:core:navigation` module:
-
-- Add a dependency on `:<existingfeaturename>:api` - this allows `Navigator` to access the feature's routes. It is not good practice for `:core` modules to depend on `:feature` modules, however, this is necessary during migration. This dependency will be removed once migration is complete.
 
 Create the `impl` module:
 
@@ -315,13 +329,13 @@ Taking the code example from above. The starting route is A.
 Review the provided `Navigator` class to ensure that it can model your app's current navigation behavior. In particular:
 
 - Review the [`add method`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step2/Navigator.kt#L142)
-- Note that `popUpTo` in the [`navigate`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step7/Navigator.kt#L121) will be ignored when switching to Nav3 in the final step. There is no equivalent to `popUpTo` in Nav3 because you control the back stack. The supplied `Navigator` class does, however, include logic to pop all top level stacks up to the starting stack when navigating to a new top level route. This behavior can be toggled using `canTopLevelRoutesExistTogether`.
+- Note that `popUpTo` in the [`navigate`](https://github.com/android/nav3-recipes/blob/main/app/src/main/java/com/example/nav3recipes/migration/step7/Navigator.kt#L121) will be ignored when switching to Nav3 in the final step. There is no equivalent to `popUpTo` in Nav3 because you control the back stack. The supplied `Navigator` class does, however, include logic to pop all top level stacks up to the starting stack when navigating to a new top level route.
 
 #### 3.2.2 Update routes to implement marker interfaces
 
 Steps:
 
-- Update each top level route so that it implements the `Route.TopLevel` interface provided by `Navigator.kt`
+- Update each top level route within the feature so that it implements the `Route.TopLevel` interface provided by `Navigator.kt`
 - Update each shared route so that it implements the `Route.Shared` interface provided by `Navigator.kt`
 - Ensure that navigation tests pass
 
@@ -438,23 +452,20 @@ private fun EntryProviderBuilder<Any>.featureBSection() {
 }
 ```
 
-### 4.3 In Navigator, convert NavBackStackEntry back to its route instance 
+### 4.3 Convert `NavBackStackEntry` to its route instance using `entryToRouteMapper` 
 
 Steps:
 
-- Locate the line starting `val route` in `Navigator`.
-- Add an `if` branch for each migrated route that converts the `NavBackStackEntry` into a route instance using `NavBackStackEntry.toRoute<MigratedRouteType>`. For example:
+- If you haven't already, add the lambda parameter `entryToRouteMapper` when creating `Navigator`
+- For each migrated route, convert the `NavBackStackEntry` that contains that route back into its route instance using `NavBackStackEntry.toRouteOrNull`. For example:
 
 ```
-val route =
-   if (destination.hasRoute<RouteB>()) {
-       entry.toRoute<RouteB>()
-   } else if (destination.hasRoute<RouteB1>()) {
-       entry.toRoute<RouteB1>()
-   } else {
-       // Non migrated route
-       entry
-   }
+Navigator(..., 
+    entryToRouteMapper = { entry -> 
+        entry.toRouteOrNull<RouteA>() ?: 
+            entry.toRouteOrNull<RouteB>()
+    }
+)        
 ```
 
 You should now be able to navigate to, and back from, the migrated destinations. These destinations will be displayed directly inside `NavDisplay` rather than by `NavHost`.
@@ -538,7 +549,6 @@ Remove the `fallback` parameter from `entryProvider` as there are no longer any 
 ### 7.6. Remove unused dependencies 
 
 - Remove all remaining Nav2 dependencies from the project
-- In `:core:navigation` remove any dependencies on `:feature:api` modules
 
 ### 7.7 Run navigation tests
 Ensure that all navigation tests pass.
