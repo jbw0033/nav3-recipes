@@ -95,18 +95,33 @@ class AnimatedActivity : ComponentActivity() {
                 },
                 transitionSpec = {
                     // Slide in from right when navigating forward
-                    slideInHorizontally(initialOffsetX = { it }) togetherWith
-                            slideOutHorizontally(targetOffsetX = { -it })
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(1000)
+                    ) togetherWith slideOutHorizontally(
+                        targetOffsetX = { -it },
+                        animationSpec = tween(1000)
+                    )
                 },
                 popTransitionSpec = {
                     // Slide in from left when navigating back
-                    slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                            slideOutHorizontally(targetOffsetX = { it })
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(1000)
+                    ) togetherWith slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(1000)
+                    )
                 },
                 predictivePopTransitionSpec = {
                     // Slide in from left when navigating back
-                    slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                            slideOutHorizontally(targetOffsetX = { it })
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(1000)
+                    ) togetherWith slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(1000)
+                    )
                 }
             )
         }
