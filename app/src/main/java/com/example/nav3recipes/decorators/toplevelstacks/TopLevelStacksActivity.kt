@@ -86,6 +86,10 @@ data class NavBarItem(
     val description: String
 )
 
+/**
+ * TODO Investigate why state isn't restored after configuration changes
+ */
+
 
 class TopLevelStacksActivity : ComponentActivity() {
 
@@ -188,7 +192,15 @@ private fun EntryProviderScope<Route>.featureASection(
             }
         }
     }
-    entry<RouteA1> { ContentPink("Route A1 title") }
+    entry<RouteA1> { ContentPink("Route A1 title") {
+        var count by rememberSaveable {
+            mutableIntStateOf(0)
+        }
+
+        Button(onClick = { count++ }){
+            Text("Value: $count")
+        }
+    } }
     entry<RouteE> { ContentBlue("Route E title") }
 }
 
