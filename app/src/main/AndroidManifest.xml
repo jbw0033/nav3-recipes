@@ -141,6 +141,10 @@
             android:name=".migration.step7.Step7MigrationActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
+        <activity
+            android:name=".scenes.listdetail.ListDetailActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Nav3Recipes"/>
     </application>
 
 </manifest>
