@@ -4,7 +4,9 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,11 +47,9 @@ class ListDetailScene<T : Any>(
                     targetState = detailEntry,
                     //contentKey = { entry -> entry.contentKey },
                     transitionSpec = {
-                        // Slide new content up, keeping the old content in place underneath
-                        slideInVertically(
-                            initialOffsetY = { it },
-                            animationSpec = tween(1000)
-                        ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                        // Slide new content in from the left,
+                        slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                            slideOutHorizontally(targetOffsetX = { it })
                     }
                 ){ entry ->
                     entry.Content()
