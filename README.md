@@ -23,7 +23,7 @@ Examples showing how to use the layouts provided by the [Compose Material3 Adapt
 ### Common use cases
 - **[Common navigation UI](app/src/main/java/com/example/nav3recipes/commonui)**: A common navigation toolbar where each item in the toolbar navigates to a top level destination.
 - **[Conditional navigation](app/src/main/java/com/example/nav3recipes/conditional)**: Switch to a different navigation flow when a condition is met. For example, for authentication or first-time user onboarding.
-
+- **[Return Result](app/src/main/java/com/example/nav3recipes/results)**: Return a result to a previous destination
 ### Architecture
 - **[Modularized navigation code](app/src/main/java/com/example/nav3recipes/modular/hilt)**: Demonstrates how to decouple navigation code into separate modules (uses Dagger/Hilt for DI). 
 
