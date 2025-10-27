@@ -32,10 +32,13 @@ Examples showing how to use the layouts provided by the [Compose Material3 Adapt
 - **[Hilt injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/viewmodels/hilt)**: Navigation arguments are passed to a ViewModel constructed using `hiltViewModel()`
 - **[Koin injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/viewmodels/koin)**: Navigation arguments are passed to a ViewModel constructed using `koinViewModel()`
 
+### Returning Results
+- **[Returning Event Results](app/src/main/java/com/example/nav3recipes/results/event)**: Returning a result event to content in another NavEntry.
+- **[Returning State Results](app/src/main/java/com/example/nav3recipes/results/state)**: Returning results as state stored in a composition Local.
+
 ### Planned
 - **Deeplinks**: Create and handle deeplinks to specific destinations
 - **Android XR**: Custom navigation and layout behavior for Android XR
-- **Returning a result from a destination**: Return a result to a previous destination
 
 ## Custom layout example
 The following is a screen recording showing the navigation behavior of a [custom, two-pane Scene](app/src/main/java/com/example/nav3recipes/scenes/twopane).
