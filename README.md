@@ -33,8 +33,8 @@ Examples showing how to use the layouts provided by the [Compose Material3 Adapt
 - **[Koin injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/viewmodels/koin)**: Navigation arguments are passed to a ViewModel constructed using `koinViewModel()`
 
 ### Returning Results
-- **[Returning Event Results](app/src/main/java/com/example/nav3recipes/results/event)**: Returning a result event to content in another NavEntry.
-- **[Returning State Results](app/src/main/java/com/example/nav3recipes/results/state)**: Returning results as state stored in a composition Local.
+- **[Returning Results as Events](app/src/main/java/com/example/nav3recipes/results/event)**: Returning results as events to content in another NavEntry.
+- **[Returning Results as State](app/src/main/java/com/example/nav3recipes/results/state)**: Returning results as state stored in a CompositionLocal.
 
 ### Planned
 - **Deeplinks**: Create and handle deeplinks to specific destinations
