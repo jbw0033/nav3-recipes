@@ -42,7 +42,7 @@ Examples showing how to use the layouts provided by the [Compose Material3 Adapt
 ## Custom layout example
 The following is a screen recording showing the navigation behavior of a [custom, list-detail Scene](app/src/main/java/com/example/nav3recipes/scenes/listdetail).
 
-![Custom layout example](/docs/images/ListDetailScene.webm)
+![Custom layout example](/docs/images/ListDetailScene.mp4)
 
 ## Instructions
 Clone this repository and open the root folder in [Android Studio](https://developer.android.com/studio). Each recipe is contained in its own package with its own `Activity`.
