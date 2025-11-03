@@ -98,8 +98,14 @@ fun <T : Any> rememberListDetailSceneStrategy(): ListDetailSceneStrategy<T> {
 
 
 /**
- * A [SceneStrategy] that returns a [ListDetailScene] if the window is wide enough
- * and the last two back stack entries are list and detail.
+ * A [SceneStrategy] that returns a [ListDetailScene] if:
+ *
+ * - the window width is over 600dp
+ * - A `Detail` entry is the last item in the back stack
+ * - A `List` entry is in the back stack
+ *
+ * Notably, when the detail entry changes the scene's key does not change. This allows the scene,
+ * rather than the NavDisplay, to handle animations when the detail entry changes.
  */
 class ListDetailSceneStrategy<T : Any>(val windowSizeClass: WindowSizeClass) : SceneStrategy<T> {
 
