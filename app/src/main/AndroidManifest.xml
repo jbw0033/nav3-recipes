@@ -149,10 +149,6 @@
             android:name=".scenes.listdetail.ListDetailActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
-        <activity
-            android:name=".scenes.nonav3.BasicActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Nav3Recipes"/>
     </application>
 
 </manifest>
