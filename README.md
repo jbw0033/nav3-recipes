@@ -12,6 +12,7 @@ These are the recipes and what they demonstrate.
 
 ### Layouts using Scenes
 - **[List-Detail Scene](app/src/main/java/com/example/nav3recipes/scenes/listdetail)**: Shows how to create a custom, list-detail layout using a `Scene` and `SceneStrategy` (see video of UI behavior below).
+- **[BottomSheet](app/src/main/java/com/example/nav3recipes/bottomsheet)**: Shows how to create a BottomSheet destination.
 - **[Dialog](app/src/main/java/com/example/nav3recipes/dialog)**: Shows how to create a Dialog
 
 ### Material adaptive layouts
@@ -34,10 +35,13 @@ Examples showing how to use the layouts provided by the [Compose Material3 Adapt
 - **[Hilt injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/viewmodels/hilt)**: Navigation arguments are passed to a ViewModel constructed using `hiltViewModel()`
 - **[Koin injected ViewModel](app/src/main/java/com/example/nav3recipes/passingarguments/viewmodels/koin)**: Navigation arguments are passed to a ViewModel constructed using `koinViewModel()`
 
+### Returning Results
+- **[Returning Results as Events](app/src/main/java/com/example/nav3recipes/results/event)**: Returning results as events to content in another NavEntry.
+- **[Returning Results as State](app/src/main/java/com/example/nav3recipes/results/state)**: Returning results as state stored in a CompositionLocal.
+
 ### Planned
 - **Deeplinks**: Create and handle deeplinks to specific destinations
 - **Android XR**: Custom navigation and layout behavior for Android XR
-- **Returning a result from a destination**: Return a result to a previous destination
 
 ## Custom layout example
 The following is a screen recording showing the navigation behavior of a [custom, list-detail Scene](app/src/main/java/com/example/nav3recipes/scenes/listdetail).

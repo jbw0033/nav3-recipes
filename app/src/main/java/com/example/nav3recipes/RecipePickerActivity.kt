@@ -45,6 +45,7 @@ import com.example.nav3recipes.animations.AnimatedActivity
 import com.example.nav3recipes.basic.BasicActivity
 import com.example.nav3recipes.basicdsl.BasicDslActivity
 import com.example.nav3recipes.basicsaveable.BasicSaveableActivity
+import com.example.nav3recipes.bottomsheet.BottomSheetActivity
 import com.example.nav3recipes.commonui.CommonUiActivity
 import com.example.nav3recipes.conditional.ConditionalActivity
 import com.example.nav3recipes.dialog.DialogActivity
@@ -77,6 +78,7 @@ private val recipes = listOf(
 
     Heading("Layouts using Scenes"),
     Recipe("List-detail", ListDetailActivity::class.java),
+    Recipe("Bottom Sheet", BottomSheetActivity::class.java),
     Recipe("Dialog", DialogActivity::class.java),
 
     Heading("Material adaptive layouts"),
