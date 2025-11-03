@@ -19,7 +19,6 @@ package com.example.nav3recipes.results.event
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
@@ -38,6 +37,8 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.nav3recipes.content.ContentBlue
+import com.example.nav3recipes.content.ContentGreen
 import kotlinx.serialization.Serializable
 
 /**
@@ -53,7 +54,9 @@ import kotlinx.serialization.Serializable
 data object Home : NavKey
 
 @Serializable
-class ResultPage : NavKey
+class PersonDetailsForm : NavKey
+
+data class Person(val name: String, val favoriteColor: String)
 
 class ResultEventActivity : ComponentActivity() {
 
@@ -75,38 +78,51 @@ class ResultEventActivity : ComponentActivity() {
                             when (key) {
                                 is Home -> NavEntry(key) {
                                     val viewModel = viewModel<HomeViewModel>(key = Home.toString())
-                                    ResultEffect<Name> { name ->
-                                        viewModel.name = name
+                                    ResultEffect<Person> { person ->
+                                        viewModel.person = person
                                     }
 
-                                    Column {
-                                        Text("Welcome to Nav3")
-                                        Button(onClick = {
-                                            backStack.add(ResultPage())
-                                        }) {
-                                            Text("Click to provide a name")
+                                    val person = viewModel.person
+
+                                    ContentBlue("Hello ${person?.name ?: "unknown person"}"){
+
+                                        if (person != null){
+                                            Text("Your favorite color is ${person.favoriteColor}\n")
                                         }
-                                        if (viewModel.name == null) {
-                                            Text("I don't know who you are")
-                                        } else {
-                                            Text("Hi, ${viewModel.name}")
+
+                                        Button(onClick = {
+                                            backStack.add(PersonDetailsForm())
+                                        }) {
+                                            Text("Tell us about yourself")
                                         }
                                     }
                                 }
 
-                                is ResultPage -> NavEntry(key) {
-                                    Column {
+                                is PersonDetailsForm -> NavEntry(key) {
+                                    ContentGreen("About you"){
 
-                                        val state = rememberTextFieldState()
+                                        val nameTextState = rememberTextFieldState()
                                         OutlinedTextField(
-                                            state = state,
-                                            label = { Text("Please enter a name") }
+                                            state = nameTextState,
+                                            label = { Text("Please enter your name") }
                                         )
+
+                                        val favoriteColorTextState = rememberTextFieldState()
+                                        OutlinedTextField(
+                                            state = favoriteColorTextState,
+                                            label = { Text("Please enter your favorite color") }
+                                        )
+
                                         Button(onClick = {
-                                            resultBus.sendResult<Name>(result = state.text.toString())
+                                            val person = Person(
+                                                name = nameTextState.text.toString(),
+                                                favoriteColor = favoriteColorTextState.text.toString()
+                                            )
+
+                                            resultBus.sendResult<Person>(result = person)
                                             backStack.removeLastOrNull()
                                         }) {
-                                            Text("Return name")
+                                            Text("Submit")
                                         }
                                     }
                                 }
@@ -121,7 +137,5 @@ class ResultEventActivity : ComponentActivity() {
 }
 
 class HomeViewModel : ViewModel() {
-    var name by mutableStateOf<String?>(null)
+    var person by mutableStateOf<Person?>(null)
 }
-
-typealias Name = String
