@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.nav3recipes
 
 import android.app.Activity
@@ -40,7 +56,7 @@ import com.example.nav3recipes.material.listdetail.MaterialListDetailActivity
 import com.example.nav3recipes.material.supportingpane.MaterialSupportingPaneActivity
 import com.example.nav3recipes.results.event.ResultEventActivity
 import com.example.nav3recipes.results.state.ResultStateActivity
-import com.example.nav3recipes.scenes.twopane.TwoPaneActivity
+import com.example.nav3recipes.scenes.listdetail.ListDetailActivity
 import com.example.nav3recipes.ui.setEdgeToEdgeConfig
 
 /**
@@ -59,12 +75,16 @@ private val recipes = listOf(
     Recipe("Basic DSL", BasicDslActivity::class.java),
     Recipe("Basic Saveable", BasicSaveableActivity::class.java),
 
-    Heading("Layouts and animations"),
+    Heading("Layouts using Scenes"),
+    Recipe("List-detail", ListDetailActivity::class.java),
+    Recipe("Dialog", DialogActivity::class.java),
+
+    Heading("Material adaptive layouts"),
     Recipe("Material list-detail layout", MaterialListDetailActivity::class.java),
     Recipe("Material supporting-pane layout", MaterialSupportingPaneActivity::class.java),
-    Recipe("Dialog", DialogActivity::class.java),
-    Recipe("Two pane layout (custom scene)", TwoPaneActivity::class.java),
-    Recipe("Animations", AnimatedActivity::class.java),
+
+    Heading("Animations"),
+    Recipe("NavDisplay and NavEntry animations", AnimatedActivity::class.java),
 
     Heading("Common use cases"),
     Recipe("Common UI", CommonUiActivity::class.java),

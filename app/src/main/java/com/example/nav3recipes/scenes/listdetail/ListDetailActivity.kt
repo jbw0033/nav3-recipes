@@ -122,11 +122,9 @@ class ListDetailActivity : ComponentActivity() {
 
 private fun NavBackStack<NavKey>.addDetail(detailRoute: ConversationDetail) {
 
-    // Remove any existing detail routes
+    // Remove any existing detail routes before adding this detail route.
+    // In certain scenarios, such as when multiple detail panes can be shown at once, it may
+    // be desirable to keep existing detail routes on the back stack.
     removeIf { it is ConversationDetail }
-
-    // Avoid adding the same detail route to the back stack twice.
-    if (!contains(detailRoute)) {
-        add(detailRoute)
-    }
+    add(detailRoute)
 }

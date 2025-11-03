@@ -45,11 +45,12 @@ class ListDetailScene<T : Any>(
             Column(modifier = Modifier.weight(0.6f)) {
                 AnimatedContent(
                     targetState = detailEntry,
-                    //contentKey = { entry -> entry.contentKey },
+                    contentKey = { entry -> entry.contentKey },
                     transitionSpec = {
-                        // Slide new content in from the left,
-                        slideInHorizontally(initialOffsetX = { -it }) togetherWith
-                            slideOutHorizontally(targetOffsetX = { it })
+                        slideInHorizontally(
+                            initialOffsetX = { it }
+                        ) togetherWith
+                            slideOutHorizontally(targetOffsetX = { -it })
                     }
                 ){ entry ->
                     entry.Content()
@@ -64,13 +65,13 @@ class ListDetailScene<T : Any>(
 
         /**
          * Helper function to add metadata to a [NavEntry] indicating it can be displayed
-         * as a list in the [ListDetailScene].
+         * in the list pane of a [ListDetailScene].
          */
         fun listPane() = mapOf(LIST_KEY to true)
 
         /**
          * Helper function to add metadata to a [NavEntry] indicating it can be displayed
-         * as a list in the [ListDetailScene].
+         * in the detail pane of a the [ListDetailScene].
          */
         fun detailPane() = mapOf(DETAIL_KEY to true)
     }
