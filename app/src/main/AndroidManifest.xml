@@ -78,10 +78,6 @@
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
-            android:name=".scenes.twopane.TwoPaneActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Nav3Recipes"/>
-        <activity
             android:name=".animations.AnimatedActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
