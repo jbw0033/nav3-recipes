@@ -21,12 +21,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.results.common.Home
@@ -43,8 +42,6 @@ import com.example.nav3recipes.results.common.PersonDetailsScreen
  * - Implementing a [ResultEffect] in the receiving screen
  * - Calling [ResultEventBus.sendResult] from the sending screen.
  */
-
-
 class ResultEventActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,28 +58,26 @@ class ResultEventActivity : ComponentActivity() {
                         backStack = backStack,
                         modifier = Modifier.padding(paddingValues),
                         onBack = { backStack.removeLastOrNull() },
-                        entryProvider = { key ->
-                            when (key) {
-                                is Home -> NavEntry(key) {
-                                    val viewModel = viewModel<HomeViewModel>(key = Home.toString())
-                                    ResultEffect<Person> { person ->
-                                        viewModel.person = person
+                        entryProvider = entryProvider {
+                            entry<Home>{
+                                val viewModel = viewModel<HomeViewModel>(key = Home.toString())
+                                ResultEffect<Person> { person ->
+                                    viewModel.person = person
+                                }
+
+                                val person = viewModel.person
+                                HomeScreen(
+                                    person = person,
+                                    onNext = { backStack.add(PersonDetailsForm()) }
+                                )
+                            }
+                            entry<PersonDetailsForm>{
+                                PersonDetailsScreen(
+                                    onSubmit = { person ->
+                                        resultBus.sendResult<Person>(result = person)
+                                        backStack.removeLastOrNull()
                                     }
-
-                                    val person = viewModel.person
-                                    HomeScreen(backStack, person)
-                                }
-
-                                is PersonDetailsForm -> NavEntry(key) {
-                                    PersonDetailsScreen(
-                                        onSubmit = { person ->
-                                            resultBus.sendResult<Person>(result = person)
-                                            backStack.removeLastOrNull()
-                                        }
-                                    )
-                                }
-
-                                else -> NavEntry(key) { Text("Unknown route") }
+                                )
                             }
                         }
                     )

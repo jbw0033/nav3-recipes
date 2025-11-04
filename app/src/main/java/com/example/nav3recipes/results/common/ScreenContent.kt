@@ -25,15 +25,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
 import com.example.nav3recipes.content.ContentBlue
 import com.example.nav3recipes.content.ContentGreen
 
 @Composable
 fun HomeScreen(
-    backStack: NavBackStack<NavKey>,
-    person: Person?
+    person: Person?,
+    onNext: () -> Unit
 ) {
     ContentBlue("Hello ${person?.name ?: "unknown person"}") {
 
@@ -42,9 +40,7 @@ fun HomeScreen(
         }
 
         Spacer(Modifier.height(16.dp))
-        Button(onClick = {
-            backStack.add(PersonDetailsForm())
-        }) {
+        Button(onClick = onNext) {
             Text("Tell us about yourself")
         }
     }

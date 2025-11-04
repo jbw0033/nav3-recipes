@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.nav3recipes.results.common.Home
@@ -40,7 +41,6 @@ import com.example.nav3recipes.results.common.PersonDetailsScreen
  * - Calling [ResultStore.getResultState] in the receiving screen
  * - Calling [ResultStore.setResult] from the sending screen.
  */
-
 class ResultStateActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,38 +48,33 @@ class ResultStateActivity : ComponentActivity() {
 
         setContent {
             val resultStore = rememberResultStore()
-            CompositionLocalProvider(LocalResultStore.provides(resultStore)) {
-                Scaffold { paddingValues ->
-                    val backStack = rememberNavBackStack(Home)
 
-                    NavDisplay(
-                        backStack = backStack,
-                        modifier = Modifier.padding(paddingValues),
-                        onBack = { backStack.removeLastOrNull() },
-                        entryProvider = { key ->
-                            when (key) {
-                                is Home -> NavEntry(key) {
-                                    val person = resultStore.getResultState<Person?>()
-                                    HomeScreen(backStack, person)
-                                }
+            Scaffold { paddingValues ->
+                val backStack = rememberNavBackStack(Home)
 
-                                is PersonDetailsForm -> NavEntry(key) {
-                                    PersonDetailsScreen(
-                                        onSubmit = { person ->
-                                            resultStore.setResult<Person>(result = person)
-                                            backStack.removeLastOrNull()
-                                        }
-                                    )
-                                }
-
-                                else -> NavEntry(key) { Text("Unknown route") }
-                            }
+                NavDisplay(
+                    backStack = backStack,
+                    modifier = Modifier.padding(paddingValues),
+                    onBack = { backStack.removeLastOrNull() },
+                    entryProvider = entryProvider {
+                        entry<Home>{
+                            val person = resultStore.getResultState<Person?>()
+                            HomeScreen(
+                                person = person,
+                                onNext = { backStack.add(PersonDetailsForm()) }
+                            )
                         }
-                    )
-                }
+                        entry<PersonDetailsForm>{
+                            PersonDetailsScreen(
+                                onSubmit = { person ->
+                                    resultStore.setResult<Person>(result = person)
+                                    backStack.removeLastOrNull()
+                                }
+                            )
+                        }
+                    }
+                )
             }
         }
     }
 }
-
-typealias Name = String
