@@ -49,39 +49,38 @@ class ResultEventActivity : ComponentActivity() {
 
         setContent {
             val resultBus = remember { ResultEventBus() }
-            CompositionLocalProvider(LocalResultEventBus.provides(resultBus)) {
-                Scaffold { paddingValues ->
 
-                    val backStack = rememberNavBackStack(Home)
+            Scaffold { paddingValues ->
 
-                    NavDisplay(
-                        backStack = backStack,
-                        modifier = Modifier.padding(paddingValues),
-                        onBack = { backStack.removeLastOrNull() },
-                        entryProvider = entryProvider {
-                            entry<Home>{
-                                val viewModel = viewModel<HomeViewModel>(key = Home.toString())
-                                ResultEffect<Person> { person ->
-                                    viewModel.person = person
-                                }
+                val backStack = rememberNavBackStack(Home)
 
-                                val person = viewModel.person
-                                HomeScreen(
-                                    person = person,
-                                    onNext = { backStack.add(PersonDetailsForm()) }
-                                )
+                NavDisplay(
+                    backStack = backStack,
+                    modifier = Modifier.padding(paddingValues),
+                    onBack = { backStack.removeLastOrNull() },
+                    entryProvider = entryProvider {
+                        entry<Home> {
+                            val viewModel = viewModel<HomeViewModel>(key = Home.toString())
+                            ResultEffect<Person>(resultBus) { person ->
+                                viewModel.person = person
                             }
-                            entry<PersonDetailsForm>{
-                                PersonDetailsScreen(
-                                    onSubmit = { person ->
-                                        resultBus.sendResult<Person>(result = person)
-                                        backStack.removeLastOrNull()
-                                    }
-                                )
-                            }
+
+                            val person = viewModel.person
+                            HomeScreen(
+                                person = person,
+                                onNext = { backStack.add(PersonDetailsForm()) }
+                            )
                         }
-                    )
-                }
+                        entry<PersonDetailsForm> {
+                            PersonDetailsScreen(
+                                onSubmit = { person ->
+                                    resultBus.sendResult<Person>(result = person)
+                                    backStack.removeLastOrNull()
+                                }
+                            )
+                        }
+                    }
+                )
             }
         }
     }

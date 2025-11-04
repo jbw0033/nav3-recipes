@@ -24,7 +24,8 @@ import androidx.compose.runtime.LaunchedEffect
  *
  * The trailing lambda provides the result from a flow of results.
  *
- * @param resultEventBus the ResultEventBus to retrieve the result from
+ * @param resultEventBus the ResultEventBus to retrieve the result from. The default value
+ * is read from the `LocalResultEventBus` composition local.
  * @param resultKey the key that should be associated with this effect
  * @param onResult the callback to invoke when a result is received
  */
