@@ -19,20 +19,20 @@ package com.example.nav3recipes.results.state
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import kotlinx.serialization.Serializable
+import com.example.nav3recipes.results.common.Home
+import com.example.nav3recipes.results.common.HomeScreen
+import com.example.nav3recipes.results.common.Person
+import com.example.nav3recipes.results.common.PersonDetailsForm
+import com.example.nav3recipes.results.common.PersonDetailsScreen
 
 /**
  * This recipe demonstrates passing an state result to a previous screen. It does this by:
@@ -41,13 +41,6 @@ import kotlinx.serialization.Serializable
  * - Calling [ResultStore.getResultState] in the receiving screen
  * - Calling [ResultStore.setResult] from the sending screen.
  */
-
-@Serializable
-data object Home : NavKey
-
-@Serializable
-class ResultPage : NavKey
-
 class ResultStateActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +48,7 @@ class ResultStateActivity : ComponentActivity() {
 
         setContent {
             val resultStore = rememberResultStore()
-            CompositionLocalProvider(LocalResultStore.provides(resultStore)) {
+
             Scaffold { paddingValues ->
                 val backStack = rememberNavBackStack(Home)
 
@@ -63,52 +56,25 @@ class ResultStateActivity : ComponentActivity() {
                     backStack = backStack,
                     modifier = Modifier.padding(paddingValues),
                     onBack = { backStack.removeLastOrNull() },
-                    entryProvider = { key ->
-                        when (key) {
-                            is Home -> NavEntry(key) {
-                                val name = resultStore.getResultState<Name?>()
-
-                                Column {
-                                    Text("Welcome to Nav3")
-                                    Button(onClick = {
-                                        backStack.add(ResultPage())
-                                    }) {
-                                        Text("Click to provide a name")
-                                    }
-                                    if (name == null) {
-                                        Text("I don't know who you are")
-                                    } else {
-                                        Text("Hi, $name")
-                                    }
+                    entryProvider = entryProvider {
+                        entry<Home>{
+                            val person = resultStore.getResultState<Person?>()
+                            HomeScreen(
+                                person = person,
+                                onNext = { backStack.add(PersonDetailsForm()) }
+                            )
+                        }
+                        entry<PersonDetailsForm>{
+                            PersonDetailsScreen(
+                                onSubmit = { person ->
+                                    resultStore.setResult<Person>(result = person)
+                                    backStack.removeLastOrNull()
                                 }
-
-
-                            }
-                            is ResultPage -> NavEntry(key) {
-                                Column {
-
-                                    val state = rememberTextFieldState()
-                                    OutlinedTextField(
-                                        state = state,
-                                        label = { Text("Please enter a name") }
-                                    )
-
-                                    Button(onClick = {
-                                        resultStore.setResult<Name>(result = state.text.toString())
-                                        backStack.removeLastOrNull()
-                                    }) {
-                                        Text("Return name")
-                                    }
-                                }
-                            }
-                            else -> NavEntry(key) { Text("Unknown route") }
+                            )
                         }
                     }
                 )
             }
-                }
         }
     }
 }
-
-typealias Name = String
