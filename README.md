@@ -12,8 +12,9 @@ These are the recipes and what they demonstrate.
 
 ### Layouts using Scenes
 - **[List-Detail Scene](app/src/main/java/com/example/nav3recipes/scenes/listdetail)**: Shows how to create a custom, list-detail layout using a `Scene` and `SceneStrategy` (see video of UI behavior below).
+- **[Two pane Scene](app/src/main/java/com/example/nav3recipes/scenes/twopane)**: Shows how to create a custom, 2-pane layout.
 - **[BottomSheet](app/src/main/java/com/example/nav3recipes/bottomsheet)**: Shows how to create a BottomSheet destination.
-- **[Dialog](app/src/main/java/com/example/nav3recipes/dialog)**: Shows how to create a Dialog
+- **[Dialog](app/src/main/java/com/example/nav3recipes/dialog)**: Shows how to create a Dialog.
 
 ### Material adaptive layouts
 Examples showing how to use the layouts provided by the [Compose Material3 Adaptive Navigation3 library](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#compose_material3_adaptive_navigation3_version_10_2)

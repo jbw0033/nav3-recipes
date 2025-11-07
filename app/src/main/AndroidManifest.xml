@@ -142,6 +142,10 @@
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
+            android:name=".scenes.twopane.TwoPaneActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Nav3Recipes"/>
+        <activity
             android:name=".scenes.listdetail.ListDetailActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
