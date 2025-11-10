@@ -78,10 +78,6 @@
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
-            android:name=".scenes.twopane.TwoPaneActivity"
-            android:exported="true"
-            android:theme="@style/Theme.Nav3Recipes"/>
-        <activity
             android:name=".animations.AnimatedActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
@@ -143,6 +139,14 @@
             android:theme="@style/Theme.Nav3Recipes"/>
         <activity
             android:name=".migration.step7.Step7MigrationActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Nav3Recipes"/>
+        <activity
+            android:name=".scenes.twopane.TwoPaneActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Nav3Recipes"/>
+        <activity
+            android:name=".scenes.listdetail.ListDetailActivity"
             android:exported="true"
             android:theme="@style/Theme.Nav3Recipes"/>
     </application>

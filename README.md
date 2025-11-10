@@ -15,16 +15,19 @@ These are the recipes and what they demonstrate.
 - **[Saveable back stack](app/src/main/java/com/example/nav3recipes/basicsaveable)**: As above, with a persistent back stack.
 - **[Entry provider DSL](app/src/main/java/com/example/nav3recipes/basicdsl)**: As above, using the entryProvider DSL.
 
-### Layouts and animations
-- **[Dialog](app/src/main/java/com/example/nav3recipes/dialog)**: Shows how to create a Dialog destination.
+### Layouts using Scenes
+- **[List-Detail Scene](app/src/main/java/com/example/nav3recipes/scenes/listdetail)**: Shows how to create a custom, list-detail layout using a `Scene` and `SceneStrategy` (see video of UI behavior below).
+- **[Two pane Scene](app/src/main/java/com/example/nav3recipes/scenes/twopane)**: Shows how to create a custom, 2-pane layout.
 - **[BottomSheet](app/src/main/java/com/example/nav3recipes/bottomsheet)**: Shows how to create a BottomSheet destination.
-- **[Custom Scene](app/src/main/java/com/example/nav3recipes/scenes/twopane)**: Shows how to create a custom layout using a `Scene` and `SceneStrategy` (see video of UI behavior below).
-- **[Animations](app/src/main/java/com/example/nav3recipes/animations)**: Override the default animations for all destinations and a single destination.
+- **[Dialog](app/src/main/java/com/example/nav3recipes/dialog)**: Shows how to create a Dialog.
 
 ### Material adaptive layouts
 Examples showing how to use the layouts provided by the [Compose Material3 Adaptive Navigation3 library](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#compose_material3_adaptive_navigation3_version_10_2)
 - **[List-Detail](app/src/main/java/com/example/nav3recipes/material/listdetail)**: Shows how to use a Material adaptive list-detail layout.
 - **[Supporting Pane](app/src/main/java/com/example/nav3recipes/material/supportingpane)**: Shows how to use a Material adaptive supporting pane layout.
+
+### Animations
+- **[Animations](app/src/main/java/com/example/nav3recipes/animations)**: Shows how to override the default animations for all destinations and a single destination.
 
 ### Common use cases
 - **[Common navigation UI](app/src/main/java/com/example/nav3recipes/commonui)**: A common navigation toolbar where each item in the toolbar navigates to a top level destination.
@@ -47,9 +50,9 @@ Examples showing how to use the layouts provided by the [Compose Material3 Adapt
 - **Android XR**: Custom navigation and layout behavior for Android XR
 
 ## Custom layout example
-The following is a screen recording showing the navigation behavior of a [custom, two-pane Scene](app/src/main/java/com/example/nav3recipes/scenes/twopane).
+The following is a screen recording showing the navigation behavior of a [custom, list-detail Scene](app/src/main/java/com/example/nav3recipes/scenes/listdetail).
 
-![Custom layout example](/docs/images/TwoPaneScene.gif)
+![Custom layout example](/docs/images/ListDetailScene.gif)
 
 ## Instructions
 Clone this repository and open the root folder in [Android Studio](https://developer.android.com/studio). Each recipe is contained in its own package with its own `Activity`.
