@@ -3,7 +3,7 @@
 use its APIs to implement common navigation use cases. Each recipe introduces a single concept. Instead
 of making existing recipes more complex, there should be a new recipe for that particular concept.
 
-Every Navigation3 release will be an opportunity for patterns you see in recipes to "graduate" and become
+Every Navigation 3 release will be an opportunity for patterns you see in recipes to "graduate" and become
 (optional) helpers in the library itself. Then we'll update the recipe to use that prebuilt helper, thus
 ensuring that the recipes continue to be a good way to approach these kinds of problems.
 
