@@ -1,6 +1,11 @@
 # Navigation 3 - Code recipes
 [Jetpack Navigation 3](https://goo.gle/nav3) is a library for app navigation. This repository contains recipes for how to 
-use its APIs to implement common navigation use cases.
+use its APIs to implement common navigation use cases. Each recipes introduces a single concept. Instead
+of making existing recipes more complex, there should be a new recipe for that particular concept.
+
+Every Navigation3 release will be an opportunity for patterns you see in recipes to "graduate" and become
+(optional) helpers in the library itself. Then we'll update the recipe to use that prebuilt helper, thus
+ensuring that the recipes continue to be a good way to approach these kinds of problems.
 
 ## Recipes
 These are the recipes and what they demonstrate. 
@@ -54,6 +59,9 @@ If the issue is _directly related to this project_, as in, it's reproducible wit
 
 ## Contributing
 We'd love to accept your contributions. Please follow [these instructions](CONTRIBUTING.md).
+
+## Compose Multiple Platform Recipes
+CMP recipes can be found at [this](https://github.com/terrakok/nav3-recipes) repositiory.
 
 ## License
 ```
